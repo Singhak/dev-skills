@@ -29,7 +29,7 @@ The goal: every change is **understood, tested first, attacked by its own author
 1. Restate the task in one or two sentences. If acceptance criteria are missing, write them as testable statements ("Given / When / Then").
 2. Explore the repo: README, build files (`package.json`, `pyproject.toml`, `pom.xml`, `build.gradle`, `go.mod`, `Cargo.toml`, `*.csproj`), existing tests, CI config, lint config. **Match existing conventions** — framework, folder layout, naming, test runner. Don't introduce a new tool when one already exists.
 3. Find the commands for install, build, lint, type-check, unit, integration and e2e tests (see `references/project-discovery.md`).
-4. Run the existing test suite once *before* changing anything to learn the baseline. Pre-existing failures are not yours — note them, don't silently "fix" them.
+4. Run the **relevant** existing tests *before* changing anything to learn the baseline. Small repo: the whole suite. Large repo or monorepo: the packages/modules you will touch **plus the packages that depend on them**, using the workspace tool if one exists (`nx affected -t test`, `turbo run test --filter=...[HEAD]`, `pnpm --filter "...<pkg>" test`, `bazel test $(bazel query "rdeps(//..., //pkg/...)")`, `pants --changed-since=HEAD --changed-dependents=transitive test`, `./gradlew :module:test`). Record the scope you chose. Pre-existing failures are not yours — note them, don't silently "fix" them. The full suite runs in CI.
 5. Ask the user only when a decision is genuinely ambiguous and expensive to reverse (data model, public API shape, deleting behaviour). Otherwise state your assumption and proceed.
 
 ### Step 2 — Plan small
@@ -78,7 +78,12 @@ Run through `references/security-checklist.md`. Short version:
 - **Errors**: fail closed; generic messages to clients, detailed (secret-free) logs internally.
 - **Data**: least privilege, TLS in transit, minimize stored PII.
 
-Write tests for security behaviour ("user B cannot read user A's invoice", "a script tag in a name renders as text"). Run `scripts/security_scan.sh` to use whatever scanners exist locally.
+Write tests for security behaviour ("user B cannot read user A's invoice", "a script tag in a name renders as text").
+
+Then run automated security checks, in this order of preference:
+1. The **project's own security tooling** (CI security jobs, `npm run audit`/`make security` or similar scripts, configured Semgrep/CodeQL/Snyk/Trivy).
+2. If the project has none, the scanner bundled with this skill: `scripts/security_scan.sh`, located inside the dev-core skill folder wherever it is installed. It runs only the scanners already installed on the machine.
+3. If no scanner can run, go through `references/security-checklist.md` manually and **report the automated scan as "not verified"** — a manual checklist is not a scan.
 
 ### Step 6 — Quality gates
 Before declaring done, run and pass in order: formatter → linter → type checker → unit → integration/contract → e2e for touched critical journeys → dependency/security audit → build.
@@ -155,11 +160,11 @@ Tell the user:
 
 | Check | Example commands | Pass evidence |
 |---|---|---|
-| Baseline before changes | project test command (`npm test`, `pytest`, `./gradlew test`, `go test ./...`) | Result recorded; pre-existing failures listed |
+| Baseline before changes | relevant tests only: whole suite for small repos; affected packages + dependents for monorepos (see Step 1) | Scope and result recorded; pre-existing failures listed |
 | New test fails first | run the single new test | Fails on an assertion (not an import or syntax error) |
 | Format / lint / types | `prettier --check`, `ruff check`, `eslint`, `tsc --noEmit`, `mypy`, `golangci-lint run` | Exit code 0 |
-| Full relevant suite | unit + integration commands | Exit code 0; test count went up by the tests you added |
-| Security scan | `bash scripts/security_scan.sh` | No new high/critical findings, or each one reported |
+| Relevant suite after changes | same scope as the baseline (re-run affected-packages command; scope grows if you touched more packages) | Exit code 0; test count went up by the tests you added |
+| Security scan | project's security tooling; else `bash <dev-core skill folder>/scripts/security_scan.sh`; else manual checklist | Tool ran with no new high/critical findings (or each reported). If no tool ran: "not verified" |
 | Diff hygiene | `git diff --stat`; `git diff \| grep -nEi "(api[_-]?key\|secret\|password\|token)\s*[:=]"` | Only intended files; no secrets; no debug prints |
 | Build | project build command | Exit code 0 |
 
@@ -179,4 +184,4 @@ When handing back, say what's done, the evidence, what's open, and the specific 
 - `references/break-it.md` — hacker-mode attack playbook and Break-It Report template
 - `references/code-review.md` — self-review checklist
 - `references/project-discovery.md` — commands and conventions per ecosystem
-- `scripts/security_scan.sh` — runs whichever audit / secret-scan tools are installed
+- `scripts/security_scan.sh` — fallback scanner bundled with this skill; runs whichever audit / secret-scan tools are installed
