@@ -75,6 +75,34 @@ it("returns 422 with field errors for invalid payload", async () => {
   expect(res.body.errors).toContainEqual(expect.objectContaining({ field: "quantity" }));
 });
 ```
+Python (pytest + FastAPI TestClient; same idea with Django's test client):
+```python
+def test_returns_404_for_another_users_order(client, seed_order, auth_as):
+    order = seed_order(owner_id="alice")
+    res = client.get(f"/v1/orders/{order.id}", headers=auth_as("bob"))
+    assert res.status_code == 404
+```
+Go (net/http/httptest, table-driven):
+```go
+func TestGetOrder_Authorization(t *testing.T) {
+    srv := newTestServer(t)               // real router + test DB
+    order := seedOrder(t, srv, "alice")
+    cases := []struct{ name, user string; want int }{
+        {"no token", "", http.StatusUnauthorized},
+        {"other owner", "bob", http.StatusNotFound},
+        {"owner", "alice", http.StatusOK},
+    }
+    for _, tc := range cases {
+        t.Run(tc.name, func(t *testing.T) {
+            req := httptest.NewRequest(http.MethodGet, "/v1/orders/"+order.ID, nil)
+            if tc.user != "" { req.Header.Set("Authorization", tokenFor(t, tc.user)) }
+            rec := httptest.NewRecorder()
+            srv.ServeHTTP(rec, req)
+            if rec.Code != tc.want { t.Fatalf("got %d, want %d", rec.Code, tc.want) }
+        })
+    }
+}
+```
 Make a reusable matrix for each protected endpoint: no token → 401, wrong role → 403, other owner → 403/404, valid → 2xx.
 
 ## 4. Contract testing

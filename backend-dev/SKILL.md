@@ -5,6 +5,8 @@ description: Backend engineering playbook for APIs, microservices, databases, ba
 
 # Backend Dev
 
+**How this combines**: dev-core owns the workflow, common checks and report; this skill adds server-side steps, Verify rows and stop rules only. If the UI consumes the API, also load `fullstack-integration` for the contract and client side.
+
 > **Default**: layered structure, unit tests for logic, API tests for happy path + validation + 401/403, quick security pass, one break-it round.
 > **High-risk** (auth, money, PII, schema/migration, public contract, concurrency): add the design note (`references/data-design.md`), integration tests on a real DB, the full authorization matrix and OWASP API checks (`references/backend-security.md`), race/replay attacks, and an expand/contract migration plan.
 
@@ -116,18 +118,7 @@ Each successful attack becomes a failing test, then a fix.
 - Bound everything: thread/connection pools, queue sizes, payload sizes, timeouts.
 - Graceful shutdown: stop accepting work, drain in-flight requests/jobs.
 
-## 9. Backend Definition of Done (in addition to dev-core)
-- [ ] API contract (OpenAPI/schema) updated and matches implementation
-- [ ] Unit tests for domain/use-case rules; integration tests against real DB/broker
-- [ ] API tests for happy path + 400/401/403/404/409 cases
-- [ ] Cross-user/tenant authorization test exists for every new resource endpoint
-- [ ] Migration is reversible or has a documented rollback; expand/contract followed
-- [ ] No N+1 on new queries; indexes added where needed
-- [ ] Logs structured and secret-free; metrics/traces for new endpoints
-- [ ] Outbound calls have timeouts and retry policy
-- [ ] Break-it round done: IDOR, privilege escalation, injection, race and dependency-failure attacks tried; findings fixed with tests
-
-## 10. Verify — proof required (in addition to dev-core)
+## 9. Verify — proof required (in addition to dev-core)
 | Check | Example commands | Pass evidence |
 |---|---|---|
 | Migrations | run migrations up from empty on a fresh DB container; run down/rollback if supported; then up again | All exit 0; app starts against the migrated schema |
@@ -135,8 +126,10 @@ Each successful attack becomes a failing test, then a fix.
 | Authorization matrix | API tests for 401 / 403 / other-owner / valid | Every new resource endpoint has all four cases passing |
 | API spec valid and matching | `npx @redocly/cli lint openapi.yaml` or `spectral lint`; response-validation tests | Lint exit 0; responses validate against the spec |
 | New queries | `EXPLAIN (ANALYZE)` on representative data; query-count assertion in tests | Uses intended index; no N+1 |
+| Observability & resilience | review the new code paths | Logs structured and secret-free; new endpoints emit metrics/traces; outbound calls have timeouts and a retry policy |
+| Break it (backend) | attacks in §6 | IDOR, privilege escalation, injection, race and dependency-failure attempts recorded; each finding has a test |
 
-## 11. Stop and hand back (in addition to dev-core)
+## 10. Stop and hand back (in addition to dev-core)
 - A breaking API or schema change, or a destructive migration (drop/rename column, data rewrite), is needed → propose the expand/contract plan and wait for approval.
 - No container runtime for integration tests → report it; don't switch to SQLite or an in-memory DB for a different production engine.
 - The design note has open questions about domain rules → ask before building.
