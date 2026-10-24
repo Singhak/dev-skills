@@ -1,0 +1,66 @@
+[
+  {
+    "query": "write a GitHub Actions workflow that runs tests and builds our docker image on every PR",
+    "should_trigger": true
+  },
+  {
+    "query": "create a production Dockerfile for our FastAPI app",
+    "should_trigger": true
+  },
+  {
+    "query": "add a new env var STRIPE_WEBHOOK_SECRET and make the app fail fast if it's missing",
+    "should_trigger": true
+  },
+  {
+    "query": "add liveness and readiness probes to our kubernetes deployment",
+    "should_trigger": true
+  },
+  {
+    "query": "add an S3 bucket for user uploads to our terraform, private and encrypted",
+    "should_trigger": true
+  },
+  {
+    "query": "we're releasing v2 of the checkout tomorrow, help me plan rollout and rollback",
+    "should_trigger": true
+  },
+  {
+    "query": "put the new recommendations widget behind a feature flag, off by default",
+    "should_trigger": true
+  },
+  {
+    "query": "define SLOs and burn-rate alerts for our checkout API",
+    "should_trigger": true
+  },
+  {
+    "query": "add a new field to the order DTO and return it from the API",
+    "should_trigger": false
+  },
+  {
+    "query": "the dashboard chart doesn't render on Safari",
+    "should_trigger": false
+  },
+  {
+    "query": "write unit tests for the pricing module",
+    "should_trigger": false
+  },
+  {
+    "query": "refactor the user service to use dependency injection",
+    "should_trigger": false
+  },
+  {
+    "query": "checkout is failing in production right now with 502s",
+    "should_trigger": false
+  },
+  {
+    "query": "explain what kubernetes is in simple terms",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the off-by-one error in the pagination helper",
+    "should_trigger": false
+  },
+  {
+    "query": "write the README section describing our API endpoints",
+    "should_trigger": false
+  }
+]

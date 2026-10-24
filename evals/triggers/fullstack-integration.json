@@ -1,0 +1,66 @@
+[
+  {
+    "query": "build the order history page that calls our existing GET /v1/orders endpoint, with loading and error states",
+    "should_trigger": true
+  },
+  {
+    "query": "we renamed customerName to fullName in the API, update the frontend and make sure nothing breaks",
+    "should_trigger": true
+  },
+  {
+    "query": "the like button shows liked even when the save request fails",
+    "should_trigger": true
+  },
+  {
+    "query": "after editing a product, the product list still shows the old price until I refresh",
+    "should_trigger": true
+  },
+  {
+    "query": "add a new field to the OpenAPI spec and regenerate the typescript client",
+    "should_trigger": true
+  },
+  {
+    "query": "our Next.js page shows a hydration mismatch warning on the dashboard",
+    "should_trigger": true
+  },
+  {
+    "query": "implement end-to-end: users can upload an avatar from the profile page and the API stores it",
+    "should_trigger": true
+  },
+  {
+    "query": "the frontend shows 'Something went wrong' for every API error, including validation errors",
+    "should_trigger": true
+  },
+  {
+    "query": "optimize the slow SQL query behind the reports endpoint",
+    "should_trigger": false
+  },
+  {
+    "query": "make the navbar sticky and fix its z-index on mobile",
+    "should_trigger": false
+  },
+  {
+    "query": "add a unique constraint on email in the users table",
+    "should_trigger": false
+  },
+  {
+    "query": "set up the CI pipeline to run tests on every pull request",
+    "should_trigger": false
+  },
+  {
+    "query": "write unit tests for the date formatting helper in the frontend",
+    "should_trigger": false
+  },
+  {
+    "query": "the background worker crashes on malformed JSON from the queue",
+    "should_trigger": false
+  },
+  {
+    "query": "production API latency spiked after the deploy an hour ago",
+    "should_trigger": false
+  },
+  {
+    "query": "explain REST vs GraphQL",
+    "should_trigger": false
+  }
+]

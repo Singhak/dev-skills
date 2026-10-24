@@ -1,0 +1,66 @@
+[
+  {
+    "query": "add a function to our utils that parses ISO durations like PT1H30M into seconds, with tests",
+    "should_trigger": true
+  },
+  {
+    "query": "the discount calculation returns negative totals when a coupon exceeds the cart value, can you fix it",
+    "should_trigger": true
+  },
+  {
+    "query": "refactor the OrderService class, it's 900 lines and impossible to test",
+    "should_trigger": true
+  },
+  {
+    "query": "bump lodash from 4.17.15 to 4.17.21 in our package.json and make sure nothing breaks",
+    "should_trigger": true
+  },
+  {
+    "query": "I have a merge conflict in src/billing/invoice.ts after rebasing on main, help me resolve it",
+    "should_trigger": true
+  },
+  {
+    "query": "write a CLI command in our python tool that exports user stats to CSV",
+    "should_trigger": true
+  },
+  {
+    "query": "the search endpoint is slow, around 3s, can you make it faster",
+    "should_trigger": true
+  },
+  {
+    "query": "fix the typo in the error message in auth/login.go, it says 'pasword'",
+    "should_trigger": true
+  },
+  {
+    "query": "explain the difference between TDD and BDD with examples",
+    "should_trigger": false
+  },
+  {
+    "query": "what does the OWASP top 10 list contain this year",
+    "should_trigger": false
+  },
+  {
+    "query": "write a blog post about why our team adopted test-driven development",
+    "should_trigger": false
+  },
+  {
+    "query": "review this architecture diagram and tell me if microservices make sense for a 3-person startup",
+    "should_trigger": false
+  },
+  {
+    "query": "summarize what changed in React 19 compared to React 18",
+    "should_trigger": false
+  },
+  {
+    "query": "draft an email to my manager about delaying the release by a week",
+    "should_trigger": false
+  },
+  {
+    "query": "what's a good name for a new internal developer portal",
+    "should_trigger": false
+  },
+  {
+    "query": "compare Jest and Vitest for a new project, just pros and cons, no code",
+    "should_trigger": false
+  }
+]

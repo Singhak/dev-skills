@@ -1,0 +1,66 @@
+[
+  {
+    "query": "build a settings page in our React app with a form to change display name and email",
+    "should_trigger": true
+  },
+  {
+    "query": "the modal in our Vue app traps keyboard focus incorrectly, screen reader users can't close it",
+    "should_trigger": true
+  },
+  {
+    "query": "add Playwright e2e tests for the signup flow",
+    "should_trigger": true
+  },
+  {
+    "query": "our Angular dashboard's LCP is 4.5 seconds, improve it",
+    "should_trigger": true
+  },
+  {
+    "query": "create a reusable Select component in our design system with keyboard support",
+    "should_trigger": true
+  },
+  {
+    "query": "show an empty state and an error state on the orders list page",
+    "should_trigger": true
+  },
+  {
+    "query": "add analytics events for checkout started and completed following our tracking plan",
+    "should_trigger": true
+  },
+  {
+    "query": "the svelte table re-renders on every keystroke in the filter box",
+    "should_trigger": true
+  },
+  {
+    "query": "add a GET /orders endpoint to the express API",
+    "should_trigger": false
+  },
+  {
+    "query": "write a postgres migration for a new reviews table",
+    "should_trigger": false
+  },
+  {
+    "query": "set up a Dockerfile for the frontend app with nginx",
+    "should_trigger": false
+  },
+  {
+    "query": "users in production report a blank page after today's release",
+    "should_trigger": false
+  },
+  {
+    "query": "design a logo for our app",
+    "should_trigger": false
+  },
+  {
+    "query": "write user stories for the new onboarding flow",
+    "should_trigger": false
+  },
+  {
+    "query": "what CSS framework should a beginner learn first",
+    "should_trigger": false
+  },
+  {
+    "query": "configure the CDN cache headers in our terraform for static assets",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "query": "add a POST /v1/invoices endpoint that creates an invoice for the logged-in customer",
+    "should_trigger": true
+  },
+  {
+    "query": "write a migration to add a nullable delivery_note column to orders in postgres",
+    "should_trigger": true
+  },
+  {
+    "query": "our FastAPI service needs rate limiting on the login route",
+    "should_trigger": true
+  },
+  {
+    "query": "the nightly job that syncs inventory from the ERP sometimes processes the same message twice",
+    "should_trigger": true
+  },
+  {
+    "query": "design the database schema for a multi-tenant booking system",
+    "should_trigger": true
+  },
+  {
+    "query": "add pagination to the GET /products spring boot controller",
+    "should_trigger": true
+  },
+  {
+    "query": "implement a webhook receiver for Stripe events in our Go service with signature verification",
+    "should_trigger": true
+  },
+  {
+    "query": "the users table query in the admin API is doing N+1 selects, fix it",
+    "should_trigger": true
+  },
+  {
+    "query": "make the product cards on the shop page responsive on mobile",
+    "should_trigger": false
+  },
+  {
+    "query": "the react form doesn't show validation errors when the email is invalid",
+    "should_trigger": false
+  },
+  {
+    "query": "write a GitHub Actions workflow that builds and pushes our docker image",
+    "should_trigger": false
+  },
+  {
+    "query": "checkout has been returning 500s in production since last night's deploy",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the typo in README",
+    "should_trigger": false
+  },
+  {
+    "query": "change the button color on the settings page to match the design system",
+    "should_trigger": false
+  },
+  {
+    "query": "add an S3 bucket for uploads to our terraform",
+    "should_trigger": false
+  },
+  {
+    "query": "explain what an ORM is to a junior developer",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "query": "checkout has been returning 500 errors in production since last night's deploy, here's the sentry link",
+    "should_trigger": true
+  },
+  {
+    "query": "users in prod report they get logged out every few minutes since this morning",
+    "should_trigger": true
+  },
+  {
+    "query": "our p95 latency on the search API jumped from 200ms to 3s in production, here's the grafana dashboard",
+    "should_trigger": true
+  },
+  {
+    "query": "a customer says they saw another customer's order in their account on the live site",
+    "should_trigger": true
+  },
+  {
+    "query": "the order events queue backlog in prod keeps growing and the DLQ has thousands of messages",
+    "should_trigger": true
+  },
+  {
+    "query": "staging shows a blank white screen after today's frontend release, works locally",
+    "should_trigger": true
+  },
+  {
+    "query": "we got paged: payments service error rate 15% in eu-west, what's going on",
+    "should_trigger": true
+  },
+  {
+    "query": "some users are charged twice in production, here are three order IDs",
+    "should_trigger": true
+  },
+  {
+    "query": "my unit test for the parser fails locally, can you see why",
+    "should_trigger": false
+  },
+  {
+    "query": "the feature I'm building throws a null pointer when I run it on my machine",
+    "should_trigger": false
+  },
+  {
+    "query": "set up error tracking with Sentry for our frontend",
+    "should_trigger": false
+  },
+  {
+    "query": "write a runbook template for on-call engineers",
+    "should_trigger": false
+  },
+  {
+    "query": "add alerts for high error rate to our monitoring config",
+    "should_trigger": false
+  },
+  {
+    "query": "explain what an SLO error budget is",
+    "should_trigger": false
+  },
+  {
+    "query": "the CI build is failing on the lint step for my PR",
+    "should_trigger": false
+  },
+  {
+    "query": "write a post about lessons learned from outages in general",
+    "should_trigger": false
+  }
+]
