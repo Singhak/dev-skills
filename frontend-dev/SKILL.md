@@ -128,6 +128,20 @@ Technical correctness isn't enough; the feature must be usable and consistent. W
 - [ ] Analytics events follow the tracking plan, fire once, contain no PII
 - [ ] Strings ready for i18n if the project localizes (no hard-coded user-facing text outside the i18n system)
 
+## 9. Verify — proof required (in addition to dev-core)
+| Check | Example commands | Pass evidence |
+|---|---|---|
+| Component and unit tests | `npx vitest run`, `npx jest`, `ng test --watch=false` | Exit 0; tests cover loading, empty, error and success |
+| Accessibility | axe in component tests; `@axe-core/playwright` in e2e | 0 serious/critical violations |
+| E2E for touched journeys | `npx playwright test <spec>` (Chromium + one mobile project) | Exit 0; no retries needed |
+| Build and bundle | `npm run build`; size-limit or bundle analyzer if configured | Build exit 0; bundle growth stated |
+| Console clean | e2e or manual run with console listener | No new errors/warnings (incl. hydration warnings) |
+
+## 10. Stop and hand back (in addition to dev-core)
+- Designs are missing for required states (empty, error, mobile), or the design system lacks a needed component → ask rather than invent a new pattern.
+- The UI needs an API change → stop and pull in `backend-dev` and `fullstack-integration`, or ask if the API is owned by another team.
+- A UX trade-off would affect conversion or accessibility → flag it for a human decision.
+
 ## Reference files
 - `references/frontend-testing.md` — Testing Library, MSW, Playwright patterns and examples
 - `references/frontend-security.md` — detailed browser security checks with test ideas
