@@ -23,12 +23,32 @@ The goal: every change is **understood, tested first, attacked by its own author
 
 ---
 
+## 0. Quick path — default vs high-risk
+Classify the change first; the rest of this skill tells you how to do each step.
+
+**High-risk** if it touches any of: authentication/authorization, money/payments, personal or sensitive data, file upload/OS/shell access, a public API or event contract, a database schema or migration, concurrency/background processing, infrastructure/deploy config, or it fixes a security bug. Everything else is **default**.
+
+| Step | Default (every change) | High-risk adds |
+|---|---|---|
+| Understand | Environment check (Step 1.3); relevant baseline tests | Write acceptance criteria explicitly; design note for new domain/schema/events |
+| Build | TDD for each behaviour | Integration tests against real dependencies |
+| Security | Quick pass: input validation, injection, authz on the touched path, no secrets | Full `references/security-checklist.md`; tests proving forbidden access fails |
+| Break it | One round on the inputs and permissions you touched | Threat list (STRIDE) + at least two rounds + concurrency/replay attacks |
+| Release | Normal gates | Feature flag recommendation; rollback plan (`ship-and-operate`) |
+| Hand back | Report with evidence | Also recommend human review of the risky parts |
+
+When unsure, treat it as high-risk.
+
 ## 1. The workflow (follow in order)
 
 ### Step 1 — Understand before touching code
 1. Restate the task in one or two sentences. If acceptance criteria are missing, write them as testable statements ("Given / When / Then").
 2. Explore the repo: README, build files (`package.json`, `pyproject.toml`, `pom.xml`, `build.gradle`, `go.mod`, `Cargo.toml`, `*.csproj`), existing tests, CI config, lint config. **Match existing conventions** — framework, folder layout, naming, test runner. Don't introduce a new tool when one already exists.
-3. Find the commands for install, build, lint, type-check, unit, integration and e2e tests (see `references/project-discovery.md`).
+3. **Environment check** — find out what you can actually run before planning verification:
+   - **Repo size**: small single project, or large repo/monorepo (workspace config such as `nx.json`, `turbo.json`, `pnpm-workspace.yaml`, Bazel/Pants/Gradle multi-module). This decides baseline scope (item 4).
+   - **Commands**: install, build, lint, type-check, unit, integration, e2e (see `references/project-discovery.md`; CI config is the most reliable source).
+   - **Tooling availability**: which runners, linters, type checkers and scanners are installed; is Docker available (integration tests); is there network access (dependency audits, package installs); is there CI or cloud access.
+   - **Rule for missing tools**: use what the project already declares (e.g. dev dependencies in the lockfile) — installing those is fine. Don't add new tools, frameworks or global installs without asking. If a check can't run, use the closest weaker check that can (e.g. unit tests with fakes when Docker is missing), and report the original check as "not verified" with the reason.
 4. Run the **relevant** existing tests *before* changing anything to learn the baseline. Small repo: the whole suite. Large repo or monorepo: the packages/modules you will touch **plus the packages that depend on them**, using the workspace tool if one exists (`nx affected -t test`, `turbo run test --filter=...[HEAD]`, `pnpm --filter "...<pkg>" test`, `bazel test $(bazel query "rdeps(//..., //pkg/...)")`, `pants --changed-since=HEAD --changed-dependents=transitive test`, `./gradlew :module:test`). Record the scope you chose. Pre-existing failures are not yours — note them, don't silently "fix" them. The full suite runs in CI.
 5. Ask the user only when a decision is genuinely ambiguous and expensive to reverse (data model, public API shape, deleting behaviour). Otherwise state your assumption and proceed.
 
