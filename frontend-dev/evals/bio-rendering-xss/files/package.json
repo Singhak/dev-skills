@@ -1,0 +1,8 @@
+{
+  "name": "profile-ui",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "vitest run" },
+  "dependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" },
+  "devDependencies": { "@testing-library/react": "^16.0.1", "jsdom": "^25.0.1", "vitest": "^2.1.4" }
+}

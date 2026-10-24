@@ -91,34 +91,17 @@ Full list: `references/frontend-security.md`. Must-haves:
 - Don't put PII or tokens in URLs, analytics events, or console logs.
 
 ## 5. Break-it attacks for frontend (dev-core Step 6)
-After the feature passes, attack it as described in `dev-core/references/break-it.md`. Frontend priorities:
-- **XSS**: put payloads (`<img src=x onerror=alert(1)>`, `javascript:` URLs) into every field, URL param, hash, and API response the component renders (mock them with MSW)
-- **Bypass the UI**: disable client validation, edit hidden fields, re-enable disabled buttons in devtools, call the API directly — the backend must still refuse (pair with a backend test)
-- **Double-submit & race**: rapid double-click on submit/pay, navigate away mid-request, two tabs editing the same item
-- **Hostile data**: very long text, emoji/RTL/zero-width characters, empty arrays, null fields, 10,000-item lists, slow or failed responses (`page.route` / MSW delay and 500)
-- **State tampering**: edit `localStorage`/cookies/URL state; deep-link straight to a later step of a wizard; use back/forward after logout
-- **Leak hunt**: inspect the built bundle, network tab, URLs, console and analytics calls for tokens, keys or PII
-- **Accessibility break**: keyboard-only, 200% zoom, screen reader labels, reduced motion
-Each successful attack becomes a failing component/e2e test, then a fix.
+Run the generic playbook in `dev-core/references/break-it.md`, plus these UI-specific attacks:
+- **XSS through every render path**: put payloads into fields, URL params/hash and mocked API responses (MSW).
+- **Bypass the UI**: re-enable disabled buttons, edit hidden fields, call the API directly — the backend must still refuse (pair with a backend test).
+- **Tamper with client state**: edit storage/cookies/URL state, deep-link into a later wizard step, use back/forward after logout.
+- **Leak hunt**: built bundle, network tab, URLs, console and analytics payloads for tokens, keys or personal data.
 
 ## 6. Product quality and UX
-Technical correctness isn't enough; the feature must be usable and consistent. What the agent should do:
-- **Design system first**: use existing components and tokens (spacing, colour, typography, radius). Don't create a one-off component when a system component fits; if a gap exists, flag it rather than inventing a new pattern silently.
-- **Complete user journeys**: walk the whole flow, not just the screen — entry points, first-time (empty) experience, success confirmation, error recovery, back/refresh behaviour, deep links, and what happens next.
-- **Microcopy**: clear, specific, action-oriented labels and messages. Error text says what happened and how to fix it ("Card expired — use a different card"), not "Something went wrong". Follow the product's tone; keep strings in the i18n system.
-- **Feedback and affordance**: every action gets visible feedback (pending state, success toast, inline confirmation); destructive actions require confirmation or offer undo.
-- **Forms**: minimal fields, correct input types and `autocomplete`, inline validation on blur, preserve input on error, sensible defaults.
-- **Analytics instrumentation**: when the project tracks events, add them per the existing tracking plan/naming convention (e.g. `object_action`: `checkout_started`, `checkout_completed`), with properties that answer real product questions, and **never** PII, tokens or free-text input. Test that key events fire once (not on every render).
-- **Conversion-critical paths** (signup, onboarding, checkout): minimize steps and distractions, keep primary action obvious, avoid layout shift around buttons.
-- **Flag UX risks for a human** instead of guessing: confusing flows, unclear copy, missing designs for states, accessibility trade-offs. The agent can't measure usability or conversion without real users — it should say so and suggest how to validate (usability test, A/B test behind a flag, analytics funnel).
+Use design-system components and tokens; handle the whole journey (empty, success, error, back/refresh); write clear, specific error text; follow the tracking plan for analytics with no personal data; flag UX risks for a human instead of guessing. Details and checklist: `references/product-quality.md`.
 
 ## 7. Performance
-- Targets (Core Web Vitals, p75): **LCP < 2.5 s, INP < 200 ms, CLS < 0.1**.
-- Code-split by route; lazy-load heavy, below-the-fold components.
-- Optimize images (modern formats, responsive `srcset`, explicit width/height, lazy loading); preload the LCP image and key fonts.
-- Avoid unnecessary re-renders (stable props, memoization only where profiling shows benefit); virtualize long lists.
-- Watch bundle size (bundle analyzer, size-limit in CI); question every new dependency.
-- Measure with Lighthouse / Lighthouse CI and real-user monitoring, not intuition.
+Targets (p75): LCP < 2.5 s, INP < 200 ms, CLS < 0.1. Check bundle-size impact of every new dependency. Techniques and measurement: `references/product-quality.md` §Performance.
 
 ## 8. Verify — proof required (in addition to dev-core)
 | Check | Example commands | Pass evidence |
@@ -138,6 +121,7 @@ Technical correctness isn't enough; the feature must be usable and consistent. W
 - A UX trade-off would affect conversion or accessibility → flag it for a human decision.
 
 ## Reference files
+- `references/product-quality.md` — design-system use, journeys, microcopy, analytics, performance techniques
 - `references/frontend-testing.md` — Testing Library, MSW, Playwright patterns and examples
 - `references/frontend-security.md` — detailed browser security checks with test ideas
 
