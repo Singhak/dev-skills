@@ -5,6 +5,9 @@ description: Frontend engineering playbook for web and mobile UIs in any framewo
 
 # Frontend Dev
 
+> **Default**: component tests for interaction plus loading/empty/error states, axe check, quick XSS/secrets pass, one break-it round.
+> **High-risk** (auth flows, payments, rich-HTML rendering, token handling, conversion-critical journeys): add e2e tests across browsers, the full checks in `references/frontend-security.md`, UI-bypass and double-submit attacks, and flag UX trade-offs for human review.
+
 Apply the `dev-core` workflow (understand → plan → TDD → security → gates → break it → report). This skill adds what is specific to UI work. Use the project's existing framework, styling approach, component library and test runner first; the patterns below are defaults when nothing exists.
 
 ## 1. Architecture
