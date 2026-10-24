@@ -7,6 +7,14 @@ set -euo pipefail
 REPO="${1:?Usage: ./install.sh /path/to/your-repo [--copy]}"
 MODE="${2:-}"
 SRC="$(cd "$(dirname "$0")" && pwd)"
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    if [ "$MODE" != "--copy" ]; then
+      echo "Windows shell detected: Git Bash 'ln -s' silently copies unless Developer Mode is on."
+      echo "Using --copy. For a real link, run install.ps1 in PowerShell (creates a junction, no admin needed)."
+      MODE="--copy"
+    fi;;
+esac
 SKILLS="dev-core backend-dev frontend-dev fullstack-integration ship-and-operate debug-production"
 
 mkdir -p "$REPO/.agents/skills"

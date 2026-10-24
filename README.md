@@ -38,19 +38,24 @@ Classify risk (default vs high-risk) → understand + environment check + smalle
 - To make it stack-specific for your team: edit the "Tools" tables and examples in `backend-dev` and `frontend-dev` to list only your stack, and add your commands to `dev-core/references/project-discovery.md`.
 
 ## Installing
-**Canonical setup (works for every agent):** real files in `<repo>/.agents/skills/`, a link `.claude/skills -> ../.agents/skills` for Claude Code, and one routing line in `AGENTS.md`. Commit all three.
+Recommended: real files in `<repo>/.agents/skills/`, a link from `.claude/skills/` for Claude Code, one line in `AGENTS.md`. Commit all three.
 
 ```bash
-./install.sh /path/to/your-repo          # does all of the above
-./install.sh /path/to/your-repo --copy   # Windows / no symlinks: copy instead of link
+./install.sh /path/to/your-repo              # macOS / Linux / WSL
+```
+```powershell
+.\install.ps1 -Repo C:\path\to\your-repo     # Windows (creates a junction; no admin needed)
 ```
 
-Fallbacks, if you can't use the repo setup:
-- **Claude.ai / Claude Desktop**: upload each `.skill` file in Settings → Capabilities → Skills.
-- **Personal, all projects**: copy the folders to `~/.agents/skills/` (Codex, Cursor, Copilot) and `~/.claude/skills/` (Claude Code).
-- **Antigravity global**: `~/.gemini/config/skills/`.
+Claude.ai / Claude Desktop: run `./package.sh` (or `.\package.ps1`) to build `.skill` files into `dist/`, then upload them in Settings → Capabilities → Skills.
 
-Per-platform locations, notes and troubleshooting: see `INSTALL.md`.
+Per-platform locations (Codex, Cursor, Copilot, Antigravity, Claude Code), personal installs and troubleshooting: **[INSTALL.md](INSTALL.md)**.
+
+## Testing the pack
+- Scanner regression tests: `bash dev-core/tests/run_scan_tests.sh`
+- Trigger evals (does the right skill load?): `evals/triggers/<skill>.json`
+- Task evals (does the agent follow the workflow?): `<skill>/evals/<case>/`, in the `claude plugin eval` format
+These evals are written but **not yet run**. Run them with the skill-creator skill or `claude plugin eval` before relying on the pack.
 
 ## Customize first
 Preferred stack and tools, coverage thresholds, folder structure, branch/PR rules, CI platform and cloud, SLO targets, analytics naming convention.

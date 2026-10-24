@@ -1,0 +1,7 @@
+dist/
+*.skill
+.DS_Store
+Thumbs.db
+*.log
+evals/results/
+*/evals/results/
