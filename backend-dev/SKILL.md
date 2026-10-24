@@ -124,6 +124,20 @@ Each successful attack becomes a failing test, then a fix.
 - [ ] Outbound calls have timeouts and retry policy
 - [ ] Break-it round done: IDOR, privilege escalation, injection, race and dependency-failure attacks tried; findings fixed with tests
 
+## 10. Verify — proof required (in addition to dev-core)
+| Check | Example commands | Pass evidence |
+|---|---|---|
+| Migrations | run migrations up from empty on a fresh DB container; run down/rollback if supported; then up again | All exit 0; app starts against the migrated schema |
+| Integration tests on real DB | `./gradlew integrationTest`, `pytest -m integration`, `npm run test:integration` | Exit 0 with Testcontainers/compose DB, not an in-memory substitute |
+| Authorization matrix | API tests for 401 / 403 / other-owner / valid | Every new resource endpoint has all four cases passing |
+| API spec valid and matching | `npx @redocly/cli lint openapi.yaml` or `spectral lint`; response-validation tests | Lint exit 0; responses validate against the spec |
+| New queries | `EXPLAIN (ANALYZE)` on representative data; query-count assertion in tests | Uses intended index; no N+1 |
+
+## 11. Stop and hand back (in addition to dev-core)
+- A breaking API or schema change, or a destructive migration (drop/rename column, data rewrite), is needed → propose the expand/contract plan and wait for approval.
+- No container runtime for integration tests → report it; don't switch to SQLite or an in-memory DB for a different production engine.
+- The design note has open questions about domain rules → ask before building.
+
 ## Reference files
 - `references/backend-testing.md` — per-stack test setup patterns and examples
 - `references/backend-security.md` — OWASP API Top 10 checks with test ideas
