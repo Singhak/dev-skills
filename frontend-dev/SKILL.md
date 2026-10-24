@@ -5,6 +5,8 @@ description: Frontend engineering playbook for web and mobile UIs in any framewo
 
 # Frontend Dev
 
+**How this combines**: dev-core owns the workflow, common checks and report; this skill adds UI-specific steps, Verify rows and stop rules only. If the change consumes or changes an API, also load `fullstack-integration`.
+
 > **Default**: component tests for interaction plus loading/empty/error states, axe check, quick XSS/secrets pass, one break-it round.
 > **High-risk** (auth flows, payments, rich-HTML rendering, token handling, conversion-critical journeys): add e2e tests across browsers, the full checks in `references/frontend-security.md`, UI-bypass and double-submit attacks, and flag UX trade-offs for human review.
 
@@ -118,20 +120,7 @@ Technical correctness isn't enough; the feature must be usable and consistent. W
 - Watch bundle size (bundle analyzer, size-limit in CI); question every new dependency.
 - Measure with Lighthouse / Lighthouse CI and real-user monitoring, not intuition.
 
-## 8. Frontend Definition of Done (in addition to dev-core)
-- [ ] Component tests cover interaction plus loading / empty / error states
-- [ ] Pure logic and hooks unit-tested
-- [ ] E2E test added/updated if a critical journey changed
-- [ ] Keyboard-only walkthrough works; axe reports no serious/critical issues
-- [ ] Responsive at mobile, tablet, desktop widths; works in supported browsers
-- [ ] No raw HTML injection without sanitization; no secrets or tokens in bundle, URLs or logs
-- [ ] Break-it round done: XSS, UI-bypass, double-submit, hostile data and state-tampering attacks tried; findings fixed with tests
-- [ ] No new console errors/warnings; bundle size impact checked
-- [ ] Uses design-system components/tokens; full journey (empty, success, error, back/refresh) handled; copy is clear
-- [ ] Analytics events follow the tracking plan, fire once, contain no PII
-- [ ] Strings ready for i18n if the project localizes (no hard-coded user-facing text outside the i18n system)
-
-## 9. Verify — proof required (in addition to dev-core)
+## 8. Verify — proof required (in addition to dev-core)
 | Check | Example commands | Pass evidence |
 |---|---|---|
 | Component and unit tests | `npx vitest run`, `npx jest`, `ng test --watch=false` | Exit 0; tests cover loading, empty, error and success |
@@ -139,8 +128,11 @@ Technical correctness isn't enough; the feature must be usable and consistent. W
 | E2E for touched journeys | `npx playwright test <spec>` (Chromium + one mobile project) | Exit 0; no retries needed |
 | Build and bundle | `npm run build`; size-limit or bundle analyzer if configured | Build exit 0; bundle growth stated |
 | Console clean | e2e or manual run with console listener | No new errors/warnings (incl. hydration warnings) |
+| Responsive & journey | e2e or screenshots at mobile and desktop widths; walk the full journey | Empty, success, error, back/refresh handled; design-system components and tokens used |
+| Analytics & i18n (if the project uses them) | test that key events fire; search diff for hard-coded user-facing strings | Each event fires once, follows the tracking plan, carries no PII; strings in the i18n system |
+| Break it (frontend) | attacks in §5 | XSS, UI-bypass, double-submit, hostile-data and state-tampering attempts recorded; each finding has a test |
 
-## 10. Stop and hand back (in addition to dev-core)
+## 9. Stop and hand back (in addition to dev-core)
 - Designs are missing for required states (empty, error, mobile), or the design system lacks a needed component → ask rather than invent a new pattern.
 - The UI needs an API change → stop and pull in `backend-dev` and `fullstack-integration`, or ask if the API is owned by another team.
 - A UX trade-off would affect conversion or accessibility → flag it for a human decision.
