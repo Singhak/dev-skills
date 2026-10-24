@@ -91,7 +91,7 @@ Full list: `references/backend-security.md` (OWASP API Security Top 10 mapped to
 - Security headers and strict CORS (explicit origins).
 - Don't leak stack traces, SQL errors, or internal IDs in error responses.
 
-## 6. Break-it attacks for backend (dev-core Step 7)
+## 6. Break-it attacks for backend (dev-core Step 6)
 After the feature passes, attack it as described in `dev-core/references/break-it.md`. Backend priorities:
 - **IDOR / tenant hopping**: swap every ID in path, query and body for another user's or tenant's
 - **Privilege escalation**: send `role`, `isAdmin`, `ownerId`, `price` fields in the body; call admin routes as a normal user
