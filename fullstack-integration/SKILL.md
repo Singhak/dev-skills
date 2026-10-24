@@ -22,13 +22,7 @@ Most fullstack bugs live at the boundary, not inside either side: the UI and API
 Details: `references/contracts-and-types.md`.
 
 ## 2. Domain modeling across the boundary
-Decide explicitly for each concept:
-- **Source of truth**: the server owns business rules and persisted state; the client owns ephemeral UI state (open panels, draft input, selection).
-- **Where validation runs**: client validation is for UX speed; server validation is the authority. Share the schema when possible so messages and rules match — but never rely on the client copy for security.
-- **Shapes per use case**: API DTOs are designed for consumers (screens/use cases), not mirrors of DB tables. Don't leak internal fields, foreign keys the UI doesn't need, or computed fields the UI recomputes differently.
-- **Money, time, IDs**: money as integer minor units or decimal strings with currency; timestamps in UTC ISO-8601, formatted to local time only in the UI; IDs opaque strings.
-- **Enums and states**: one definition shared via the contract; the UI handles unknown future enum values gracefully.
-- **Permissions**: server returns what the user may do (e.g. `allowedActions: ["edit","delete"]`) so the UI doesn't reimplement authorization rules — and the server still enforces them.
+Decide per concept: the server owns business rules and persisted state; validation runs on the server (client copy is UX only); DTOs are shaped for screens, not DB tables; money, time and IDs use safe formats. Details: `references/boundary-modeling.md`.
 
 ## 3. Errors: server → UI mapping
 - Server returns one consistent error format (RFC 9457 Problem Details with field-level `errors[]`).
@@ -69,10 +63,7 @@ Default pattern:
 Examples: `references/state-and-mutations.md`.
 
 ## 6. Real-time and eventual consistency
-- When the server processes asynchronously (queues, events), the API returns `202 Accepted` with a status resource; the UI shows a pending state and polls or subscribes (SSE/WebSocket) until done.
-- Real-time messages carry entity ID + version; the client ignores messages older than its cached version.
-- Reconnect logic: on reconnect, refetch to resync — don't assume no events were missed.
-- Tell users when data may be briefly behind ("Updating…") instead of showing contradictory numbers.
+For async server work, return 202 with a status resource and show a pending state; real-time messages carry entity version; resync on reconnect. Details: `references/boundary-modeling.md` §Real-time.
 
 ## 7. Testing across the boundary
 | Test | Purpose |
@@ -84,13 +75,12 @@ Examples: `references/state-and-mutations.md`.
 | Breaking-change check in CI | Prevents shipping incompatible changes |
 
 ## 8. Break-it attacks at the seam (dev-core Step 6)
-- Change the server response shape (missing field, extra field, null, unknown enum) — does the UI degrade gracefully or crash?
-- Slow network, timeout, offline mid-mutation, server 500 after optimistic update — does it roll back and keep user input?
-- Two tabs/users edit the same entity — lost update? 409 handled?
-- Double-click submit, browser back after submit, refresh mid-flow — duplicates?
-- Old frontend build against new API (and new frontend against old API during rollout).
-- Inspect SSR HTML and serialized state for secrets or another user's data; log in as user B in the same browser and look for user A's cached data.
-- Logout: are caches, storage and in-memory state cleared?
+Run the generic playbook in `dev-core/references/break-it.md`, plus these seam-specific attacks:
+- **Change the response shape** (missing/extra/null field, unknown enum) — the UI degrades gracefully.
+- **Fail after the optimistic update** (500, timeout, offline) — state rolls back and user input survives.
+- **Two tabs or users edit the same entity** — no lost update; 409 handled.
+- **Version skew**: old frontend build against the new API, and vice versa during rollout.
+- **Leaks across users**: inspect SSR HTML/serialized state; log in as user B in the same browser and look for user A's cached data; confirm logout clears caches.
 
 ## 9. Verify — proof required (in addition to dev-core)
 | Check | Example commands | Pass evidence |
@@ -110,5 +100,6 @@ Examples: `references/state-and-mutations.md`.
 - The contract is ambiguous (unclear field meaning, error format, pagination) → ask before generating clients.
 
 ## Reference files
+- `references/boundary-modeling.md` — domain modeling across client/server, real-time and eventual consistency
 - `references/contracts-and-types.md` — tooling per stack, versioning, breaking-change rules
 - `references/state-and-mutations.md` — code patterns for queries, optimistic updates, SSR hydration
