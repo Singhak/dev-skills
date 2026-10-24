@@ -15,6 +15,8 @@ This skill defines *how* to make any code change safely. It is stack-agnostic an
 | `ship-and-operate` | changes CI/CD, Dockerfiles, compose/K8s/IaC, env vars/secrets, health checks, monitoring/alerts, feature flags, or prepares a release/deploy | ordinary feature work that doesn't change how the app is built, configured or deployed |
 | `debug-production` | investigates something broken/slow in a **deployed** environment (error reports, alerts, traces, customer complaints) | bug found while coding locally — dev-core's bug-fix rule covers it |
 
+Every skill ends with a **Verify** table (commands plus the evidence that counts as passing) and a **Stop and hand back** list. Before reporting done, run the Verify rows of every loaded skill and check its stop conditions.
+
 Mid-task triggers: if a feature turns out to need a new env var, migration-in-deploy, or feature flag, pull in `ship-and-operate` at that point; if a UI task turns out to need an API change, pull in `backend-dev` and `fullstack-integration`.
 
 The goal: every change is **understood, tested first, attacked by its own author, secure, small, and verifiable**. Working code nobody can trust is not done.
@@ -81,7 +83,7 @@ Write tests for security behaviour ("user B cannot read user A's invoice", "a sc
 ### Step 6 — Quality gates
 Before declaring done, run and pass in order: formatter → linter → type checker → unit → integration/contract → e2e for touched critical journeys → dependency/security audit → build.
 
-If a gate can't run in this environment, say which and why — **never claim it passed**.
+If a gate can't run in this environment, say which and why — **never claim it passed**. Pass evidence for each gate is listed in section 5 (Verify).
 
 ### Step 7 — Break it: attack your own feature like a hacker
 Once the feature works and the gates are green, switch roles. You are no longer the author — you are an attacker and a hostile tester whose only goal is to make this feature fail, leak data, or misbehave. Authors test what they expect; attackers test what nobody expected. This step finds the bugs the happy-path tests missed.
@@ -104,6 +106,7 @@ Read the full diff as a strict reviewer would (`references/code-review.md`). Rem
 ### Step 9 — Report
 Tell the user:
 - What changed and why (1–3 sentences)
+- **Evidence**: each check run, the command, and the observed result (exit code, test counts, findings); unrun checks marked "not verified"
 - Tests added (by level) and the final test result
 - Security considerations checked and anything flagged
 - Break-It Report: attacks tried, issues found and fixed (with their tests), open risks
@@ -146,6 +149,29 @@ Tell the user:
 - [ ] No secrets, debug code, or unrelated changes in the diff
 - [ ] Docs updated if behaviour or interface changed
 - [ ] Clear summary delivered, including anything not verified
+
+## 5. Verify — proof required
+**Rule: no evidence, no claim.** Report a check as passed only if you ran it and saw the pass evidence. Otherwise write "not verified" and why. Use the project's own scripts first; the commands below are examples.
+
+| Check | Example commands | Pass evidence |
+|---|---|---|
+| Baseline before changes | project test command (`npm test`, `pytest`, `./gradlew test`, `go test ./...`) | Result recorded; pre-existing failures listed |
+| New test fails first | run the single new test | Fails on an assertion (not an import or syntax error) |
+| Format / lint / types | `prettier --check`, `ruff check`, `eslint`, `tsc --noEmit`, `mypy`, `golangci-lint run` | Exit code 0 |
+| Full relevant suite | unit + integration commands | Exit code 0; test count went up by the tests you added |
+| Security scan | `bash scripts/security_scan.sh` | No new high/critical findings, or each one reported |
+| Diff hygiene | `git diff --stat`; `git diff \| grep -nEi "(api[_-]?key\|secret\|password\|token)\s*[:=]"` | Only intended files; no secrets; no debug prints |
+| Build | project build command | Exit code 0 |
+
+## 6. Stop and hand back to the user
+Stop working and report when any of these is true:
+- **Done**: every Definition of Done item has evidence. Don't keep polishing or add unrequested features.
+- **Blocked**: missing access, credentials, environment, or a dependency (e.g. Docker unavailable for integration tests). Report what you couldn't verify; don't substitute a weaker setup silently.
+- **Decision needed**: ambiguous requirement, breaking public API or schema change, deleting behaviour or data, adding a major dependency or new platform, or a change well outside the requested scope.
+- **Risk line crossed**: an unfixed Critical/High break-it finding, or any step that would write to a shared or production environment.
+- **Loop limit**: the same test or error still fails after **3** distinct fix attempts. Stop, summarize what you tried and what you learned, and propose next options instead of continuing to guess.
+
+When handing back, say what's done, the evidence, what's open, and the specific question or decision you need.
 
 ## Reference files (read when relevant)
 - `references/tdd.md` — TDD in depth, test doubles, test data, legacy code
