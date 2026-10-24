@@ -5,6 +5,9 @@ description: Systematic workflow for diagnosing and fixing bugs and incidents th
 
 # Debug Production
 
+> **Default** (SEV3–SEV4, contained impact): gather evidence, trace one request, confirm the root cause, reproduce as a test, fix through the normal workflow.
+> **High-risk** (SEV1–SEV2, data loss, security signs): recommend mitigation first and hand the decision to the user, escalate security signs immediately, verify recovery in production signals, and write the post-incident review.
+
 In fullstack systems, the place a bug *shows* is rarely where it *lives*: a blank screen can be an API 500, which can be a slow query, which can be a missing index after a migration. This skill finds the real cause methodically and makes sure it can't silently return. Follow the `dev-core` workflow for the fix itself.
 
 **Safety rules:** treat production as read-only. Query logs, metrics, traces and read replicas; don't run writes, migrations, restarts, or data fixes in production unless the user explicitly asks and confirms. Never paste customer PII or secrets into chat, tickets or test fixtures — anonymize.
