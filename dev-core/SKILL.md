@@ -5,9 +5,17 @@ description: Core engineering workflow for any software change, backend or front
 
 # Dev Core — Universal Engineering Workflow
 
-This skill defines *how* to make any code change safely. It is stack-agnostic. Pair it with:
-- `backend-dev` → APIs, services, databases, queues, jobs, CLIs
-- `frontend-dev` → web/mobile UI, components, state, browser concerns
+This skill defines *how* to make any code change safely. It is stack-agnostic and is the only skill used on every coding task. Load the others only when the task matches:
+
+| Load | When the task… | Don't load when… |
+|---|---|---|
+| `backend-dev` | touches server code, APIs, DB, migrations, jobs, queues, CLIs | change is UI-only |
+| `frontend-dev` | touches UI components, pages, forms, styling, client state, browser behaviour | change is server-only |
+| `fullstack-integration` | touches **both** sides of an API, consumes a new/changed endpoint, changes a contract, or fixes stale data / type mismatch / unhandled API error bugs | one side only and contract unchanged |
+| `ship-and-operate` | changes CI/CD, Dockerfiles, compose/K8s/IaC, env vars/secrets, health checks, monitoring/alerts, feature flags, or prepares a release/deploy | ordinary feature work that doesn't change how the app is built, configured or deployed |
+| `debug-production` | investigates something broken/slow in a **deployed** environment (error reports, alerts, traces, customer complaints) | bug found while coding locally — dev-core's bug-fix rule covers it |
+
+Mid-task triggers: if a feature turns out to need a new env var, migration-in-deploy, or feature flag, pull in `ship-and-operate` at that point; if a UI task turns out to need an API change, pull in `backend-dev` and `fullstack-integration`.
 
 The goal: every change is **understood, tested first, attacked by its own author, secure, small, and verifiable**. Working code nobody can trust is not done.
 
@@ -26,6 +34,8 @@ The goal: every change is **understood, tested first, attacked by its own author
 - Break work into slices that each end in a green test run. Prefer thin vertical slices over horizontal layers.
 - For each slice list: behaviour to add, test(s) that prove it, files likely touched.
 - Identify the **risk surface**: auth, money, personal data, file/OS access, external input, concurrency, migrations. These get extra tests and the full security pass.
+- **Feature-flag check**: if the change is risky, user-visible and incomplete, or hard to roll back, recommend putting it behind a feature flag (details in `ship-and-operate`).
+- For non-trivial design (new domain area, schema, events, caching), write a short design note first (template in `backend-dev/references/data-design.md`).
 
 ### Step 3 — Test-Driven Development loop
 For every behaviour, run **Red → Green → Refactor** (details: `references/tdd.md`):
@@ -114,6 +124,17 @@ Tell the user:
 - Small focused commits; each builds and passes tests.
 - Conventional commits: `feat(scope):`, `fix(scope):`, `test:`, `refactor:`, `perf:`, `docs:`, `chore:`, `security:`.
 - Never commit secrets, `.env` files, build artefacts, or local IDE config.
+- Follow the team's branch strategy and PR rules from `CONTRIBUTING.md`/`AGENTS.md`; if none exist, use short-lived branches off main (`feat/…`, `fix/…`).
+- **PR description** (when opening or preparing a PR):
+  ```
+  ## What & why        <1–3 sentences, link issue/ticket>
+  ## How               <key design decisions, trade-offs>
+  ## Tests             <added by level; how to run>
+  ## Security & break-it  <checks done, findings fixed, open risks>
+  ## Rollout           <flags, migrations, config/env changes, rollback plan or "standard">
+  ## Screenshots       <for UI changes: before/after, mobile + desktop>
+  ```
+  Keep PRs small and reviewable (aim < ~400 changed lines excluding generated files); split otherwise.
 
 ## 4. Definition of Done
 - [ ] Acceptance criteria written; each covered by at least one test
