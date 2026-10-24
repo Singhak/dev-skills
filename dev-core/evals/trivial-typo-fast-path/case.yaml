@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: trivial-typo-fast-path
+expected_outcome: |
+  The agent treats this as a trivial change: fixes the typo, runs at most one cheap check (or says none applies), and gives a short report without the full TDD/security/break-it process.
+context:
+  scaffold_script: place-files.sh

@@ -18,8 +18,16 @@ Used on every coding task. Keep this flow short for small changes; open the refe
 
 Pull skills in mid-task when the work turns out to need them (e.g. a feature needs a new env var → `ship-and-operate`).
 
-## Step 0 — Classify the risk
-**High-risk** if the change touches: auth/permissions, money, personal data, file/OS/shell access, a public API or event contract, a DB schema/migration, concurrency/background jobs, infra/deploy config, or fixes a security bug. Otherwise **default**. When unsure, high-risk.
+**Combining skills:** this skill owns the workflow, the common checks and the report. Other skills add only their layer-specific steps, Verify rows and stop rules — don't repeat dev-core checks for each skill. Produce **one** combined evidence table and one report, however many skills are loaded.
+
+## Step 0 — Classify the change
+| Tier | What qualifies | Flow |
+|---|---|---|
+| **Trivial** | No behaviour change: typo or wording in docs/comments/UI copy, formatting, renaming a local variable, a dependency-free config value with no logic impact | Make the change → run the **one cheapest check** that would catch a mistake (lint, type-check, the nearest test file, or build) → read your diff → one-line report with that check's result. Skip baseline, TDD, security pass and break-it. |
+| **Default** | Any behaviour change that isn't high-risk | Steps 1–8 below |
+| **High-risk** | Touches auth/permissions, money, personal data, file/OS/shell access, a public API or event contract, a DB schema/migration, concurrency/background jobs, infra/deploy config, or fixes a security bug | Steps 1–8 plus the high-risk additions below |
+
+Rules: if a "trivial" edit touches logic, user input, permissions or data, it isn't trivial. When unsure between tiers, pick the higher one. Special task types (dependency upgrade, refactor-only, merge conflict, performance work, release notes) have short guides in `references/workflow-details.md` §5.
 
 High-risk adds: explicit acceptance criteria, a design note for new domain/schema/events (`backend-dev/references/data-design.md`), integration tests on real dependencies, the full security checklist, two break-it rounds with a threat list, a feature-flag and rollback recommendation, and a request for human review.
 
@@ -39,10 +47,10 @@ Slices that each end green. For each: behaviour, test that proves it, files touc
 ## Step 4 — Quick security pass (every change)
 Do these five actions on **your diff** and write one result line for each in the report:
 1. **Inputs**: list every external input your change reads (body, params, headers, files, env, messages, third-party responses). For each, point to where it's validated (type, length, format). Missing → add validation + a test.
-2. **Dangerous sinks**: run `bash <dev-core skill folder>/scripts/diff_risk_scan.sh` (scans added lines for string-built SQL, shell execution, eval, raw HTML rendering, unsafe deserialization, hard-coded secrets). Fix every true hit; note false positives.
+2. **Dangerous sinks**: run `bash <dev-core skill folder>/scripts/diff_risk_scan.sh` (exit 0 = clean, 1 = hits to review). It scans only your added lines for string-built SQL, shell execution, eval, raw HTML rendering, unsafe deserialization, disabled TLS, sensitive logging and hard-coded secrets. Review each hit: fix true issues, list false positives in the report. Then look for the same risks in your diff yourself — the scanner catches common patterns, not all of them.
 3. **Permissions**: for each new or changed endpoint/action, name the line that checks the caller may act on **this specific record**. Write one test proving another user is refused (403/404).
 4. **Secrets and logs**: confirm no secrets, tokens or personal data are added to code, tests, logs, error messages or client bundles.
-5. **Tooling**: run the project's security tooling (CI security job, audit script). If none, run `scripts/security_scan.sh`. If no scanner can run, report the scan as "not verified". New dependency added → run the ecosystem audit.
+5. **Tooling**: run the project's security tooling (CI security job, audit script). If none, run `scripts/security_scan.sh` (exit 0 = passed, 1 = findings, 2 = no scanner available). Exit 2 or no tooling at all → report the scan as "not verified". New dependency added → run the ecosystem audit.
 
 High-risk: also go through `references/security-checklist.md` in full.
 
@@ -68,7 +76,7 @@ Read it as a strict reviewer (`references/code-review.md`): no debug code, unrel
 | Break it | Attacks tried, findings fixed with tests |
 | Build | Exit 0 |
 
-Report: what changed and why · evidence table · tests added · security and break-it results · assumptions, unverified checks, follow-ups.
+Report: what changed and why · evidence table · tests added · security and break-it results · assumptions, unverified checks, follow-ups. Worked example: `references/report-example.md`.
 
 ## Stop and hand back
 - **Done**: every check above has evidence. Don't add unrequested features.
@@ -78,11 +86,12 @@ Report: what changed and why · evidence table · tests added · security and br
 - **Loop limit**: same failure after **3** distinct fix attempts — stop, summarize what you tried, propose options.
 
 ## Reference files
-- `references/workflow-details.md` — test levels and rules, design principles, git/PR template, full Definition of Done
+- `references/workflow-details.md` — test levels and rules, design principles, git/PR template, full Definition of Done, special task types
+- `references/report-example.md` — a complete final report for a default and a trivial change
 - `references/tdd.md` — TDD depth, test doubles, test data, legacy code
 - `references/security-checklist.md` — full OWASP-aligned checklist (high-risk changes)
 - `references/break-it.md` — attack playbook, payloads, Break-It Report template
 - `references/code-review.md` — self-review checklist
 - `references/project-discovery.md` — commands and conventions per ecosystem
-- `scripts/diff_risk_scan.sh` — scans added lines of your diff for dangerous patterns
+- `scripts/diff_risk_scan.sh` — scans added lines of your diff for dangerous patterns (regression tests: `tests/run_scan_tests.sh`)
 - `scripts/security_scan.sh` — fallback runner for installed audit / secret / SAST tools

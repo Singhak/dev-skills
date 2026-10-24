@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
-# Runs whichever security tools are installed locally. Read-only: never modifies code.
+# Fallback security runner: runs whichever security tools are installed locally. Read-only.
+# Prefer the project's own security tooling; use this only when the project has none.
 # Usage: bash security_scan.sh [project_dir]
+# Exit:  0 = all tools that ran passed, 1 = at least one tool reported findings or failed,
+#        2 = no scanner available (report the scan as "not verified")
 set -uo pipefail
 DIR="${1:-.}"
 cd "$DIR" || exit 1
-FOUND=0
-run() { echo; echo "=== $1 ==="; shift; "$@"; echo "(exit code: $?)"; FOUND=1; }
+FOUND=0; FAILED=0; FAILED_TOOLS=""
+run() {
+  local label="$1"; shift
+  echo; echo "=== $label ==="
+  "$@"; local rc=$?
+  echo "(exit code: $rc)"
+  FOUND=1
+  if [ $rc -ne 0 ]; then FAILED=1; FAILED_TOOLS+=" [$label]"; fi
+}
 has() { command -v "$1" >/dev/null 2>&1; }
 
 # Secret scanning
@@ -29,7 +39,15 @@ has semgrep     && run "semgrep (SAST)" semgrep scan --config auto --error --qui
 if has bandit && ls ./*.py ./**/*.py >/dev/null 2>&1; then run "bandit (Python SAST)" bandit -r . -q -x ./node_modules,./.venv,./venv; fi
 has gosec && [ -f go.mod ] && run "gosec (Go SAST)" gosec ./...
 
+echo
 if [ "$FOUND" -eq 0 ]; then
-  echo "No security scanners found. Suggest installing: gitleaks, semgrep, osv-scanner or trivy, plus the ecosystem audit tool."
-  echo "Fall back to the manual checklist in references/security-checklist.md."
+  echo "security_scan: NO SCANNER RAN. Report the automated scan as \"not verified\"."
+  echo "Suggested tools: gitleaks, semgrep, osv-scanner or trivy, plus the ecosystem audit tool."
+  exit 2
+elif [ "$FAILED" -eq 1 ]; then
+  echo "security_scan: findings or failures from:$FAILED_TOOLS"
+  exit 1
+else
+  echo "security_scan: all scanners that ran passed."
+  exit 0
 fi
