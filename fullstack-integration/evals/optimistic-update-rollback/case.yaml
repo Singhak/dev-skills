@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: optimistic-update-rollback
+expected_outcome: |
+  The agent finds that the optimistic update is never rolled back, adds an onError rollback to the previous cache value, refreshes server state when the mutation settles, surfaces an error to the user, and adds a test where the save fails and the button reverts.
+context:
+  scaffold_script: place-files.sh

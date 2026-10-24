@@ -1,9 +1,11 @@
 ---
 name: fullstack-integration
-description: Discipline for connecting frontend and backend correctly. Covers contract-first APIs (OpenAPI/GraphQL/tRPC/protobuf) with generated client types, domain modeling across the client/server boundary, shared validation, mapping server errors to UI states, data fetching and caching across SSR/CSR/RSC, mutations, optimistic updates with rollback, cache invalidation, pagination, real-time updates, and contract/e2e tests that span both sides. Use this skill when a task touches BOTH sides of an API, when the UI consumes a new or changed endpoint, when adding or changing an API contract, or when fixing bugs like stale data, wrong types, unhandled errors, hydration mismatches or lost updates. Do NOT use for purely server-internal or purely visual work; use backend-dev or frontend-dev alone for those. Always together with dev-core.
+description: Discipline for connecting frontend and backend correctly. Covers contract-first APIs (OpenAPI/GraphQL/tRPC/protobuf) with generated client types, domain modeling across the client/server boundary, shared validation, mapping server errors to UI states, data fetching and caching across SSR/CSR/RSC, mutations, optimistic updates with rollback, cache invalidation, pagination, real-time updates, and contract/e2e tests that span both sides. Use this skill when a task touches BOTH sides of an API, when the UI consumes a new or changed endpoint, when adding or changing an API contract, or when fixing bugs like stale data, wrong types, unhandled errors, hydration mismatches or lost updates. Do NOT use for purely server-internal or purely visual work; use backend-dev or frontend-dev alone for those. Loads alongside backend-dev and/or frontend-dev and always with dev-core.
 ---
 
 # Fullstack Integration
+
+**How this combines with the other skills**: this skill covers only the **seam** — contract, generated types, error mapping, client caching and mutations, SSR data flow, and tests that span both sides. Server internals (domain logic, queries, migrations) stay in `backend-dev`; UI internals (components, accessibility, styling) stay in `frontend-dev`. A typical full-stack feature loads dev-core + backend-dev + frontend-dev + this skill. Where they overlap (contract tests, error format, API mocking), follow this skill. dev-core still owns the workflow and the single combined report.
 
 > **Default**: contract updated first, client types regenerated, every error class mapped to UI behaviour, cache invalidation covered, component tests for success/empty/error/slow.
 > **High-risk** (breaking contract change, money/irreversible mutations, SSR with per-user data, real-time/async flows): add the breaking-change check and expand/contract plan, idempotency keys, leak checks on SSR output, contract verification (Pact/Schemathesis), and the full seam attacks in section 8.
@@ -90,16 +92,7 @@ Examples: `references/state-and-mutations.md`.
 - Inspect SSR HTML and serialized state for secrets or another user's data; log in as user B in the same browser and look for user A's cached data.
 - Logout: are caches, storage and in-memory state cleared?
 
-## 9. Definition of Done (in addition to dev-core, backend-dev, frontend-dev)
-- [ ] Contract updated first; client types generated; CI checks for drift and breaking changes
-- [ ] Every server error class mapped to a defined UI behaviour; user input preserved on failure
-- [ ] Query keys and invalidation cover every view showing changed data
-- [ ] Optimistic updates roll back on failure; idempotency keys on create/charge
-- [ ] SSR/CSR render consistently; no per-user data in shared caches or serialized props of others
-- [ ] Contract + component + e2e tests cover success, empty, error and slow responses
-- [ ] Break-it seam attacks run; findings fixed with tests
-
-## 10. Verify — proof required (in addition to dev-core)
+## 9. Verify — proof required (in addition to dev-core)
 | Check | Example commands | Pass evidence |
 |---|---|---|
 | Generated types are current | regenerate (`npx openapi-typescript …`, `graphql-codegen`, `buf generate`) then `git diff --exit-code` on generated files | No diff after regeneration |
@@ -107,9 +100,11 @@ Examples: `references/state-and-mutations.md`.
 | Server matches contract | Pact provider verification, or `schemathesis run openapi.yaml --base-url …` against a local server | All interactions verified; no 500s or schema violations |
 | Client handles every response class | component tests with MSW handlers for success, empty, 4xx, 5xx, slow | All pass; optimistic rollback test included where used |
 | End-to-end smoke | `npx playwright test --grep @smoke` against the local full stack | Exit 0; includes one error path and one refresh-after-mutation check |
+| Error mapping & cache | component test per error class; test that a mutation refreshes every view showing that data | Each server error class → defined UI behaviour with input preserved; no stale views after mutation |
+| Break it (seam) | attacks in §8 | Shape change, slow/offline, two-tab edit, double-submit, old-client and leak attempts recorded; each finding has a test |
 | Hydration and leaks | SSR page load in e2e with console listener; inspect serialized state | 0 hydration warnings; no secrets or other users' data in HTML/state |
 
-## 11. Stop and hand back (in addition to dev-core)
+## 10. Stop and hand back (in addition to dev-core)
 - The contract needs a breaking change → present the expand/contract plan and wait for approval.
 - The other side of the API is owned by another team or repo → deliver the proposed contract change and stop; don't implement against an unagreed contract.
 - The contract is ambiguous (unclear field meaning, error format, pagination) → ask before generating clients.
