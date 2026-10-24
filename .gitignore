@@ -6,3 +6,4 @@ Thumbs.db
 evals/results/
 */evals/results/
 evals/trigger_results.json
+__pycache__/

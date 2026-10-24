@@ -7,10 +7,12 @@ function createApp(db) {
     if (!req.userId) return res.status(401).json({ title: "Unauthorized" });
     next();
   });
-  app.get("/coupons/:code", (req, res) => {
-    const c = db.prepare("SELECT code, remaining FROM coupons WHERE code = ?").get(req.params.code);
-    if (!c) return res.status(404).json({ title: "Not found" });
-    res.json(c);
+  app.get("/coupons/:code", async (req, res, next) => {
+    try {
+      const c = await db.get("SELECT code, remaining FROM coupons WHERE code = ?", req.params.code);
+      if (!c) return res.status(404).json({ title: "Not found" });
+      res.json(c);
+    } catch (err) { next(err); }
   });
   return app;
 }

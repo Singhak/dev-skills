@@ -1,6 +1,6 @@
 # Evals (written, not yet run)
 
-**Run order, cheapest first:** (1) `bash dev-core/tests/run_scan_tests.sh` (no model, seconds); (2) `python evals/run_trigger_evals.py` (cross-skill routing, ~100 short API calls); (3) skill-creator `run_loop` per skill to tune descriptions; (4) task cases with `claude plugin eval` (full agent runs, most expensive).
+**Run order, cheapest first:** (1) `bash dev-core/tests/run_scan_tests.sh` (no model, seconds); (2) `python evals/run_trigger_evals.py --model <id>` (cross-skill routing; 96 cases × `--repeats`, default 3 = 288 short API calls; retries rate limits and saves results after every case to `evals/trigger_results.json`); (3) skill-creator `run_loop` per skill to tune descriptions; (4) task cases with `claude plugin eval` (full agent runs, most expensive).
 
 ## Trigger evals — does the right skill load?
 `triggers/<skill>.json`: 16 queries per skill (8 should trigger, 8 should not). Negatives are near-misses that belong to a sibling skill or need no skill. Format matches the skill-creator description optimizer:

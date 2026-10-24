@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 — 2026-10-24
+### Fixed
+- `frontend-dev/bio-rendering-xss` fixture: added `vitest.config.js` (React plugin + jsdom); the starting test failed with `React is not defined` before any agent change.
+- `backend-dev/coupon-double-redeem-race` fixture: async data access (like a networked driver) so a non-atomic check-then-insert really over-redeems under parallel requests (was undetectable with a synchronous driver); switched from `better-sqlite3` (no prebuilt binary for Node 24) to built-in `node:sqlite`, Node ≥ 22.13.
+- `run_trigger_evals.py`: retries 429/5xx/network errors with backoff, saves results after every case, prints the real API call count (288 by default, not ~100).
+
 ## 1.1.0 — 2026-10-24
 ### Added
 - Task evals for backend-dev (coupon double-redeem race), frontend-dev (rich-text XSS) and the stop rule (contradictory tests); every skill now has at least one case.
