@@ -5,6 +5,9 @@ description: Discipline for connecting frontend and backend correctly. Covers co
 
 # Fullstack Integration
 
+> **Default**: contract updated first, client types regenerated, every error class mapped to UI behaviour, cache invalidation covered, component tests for success/empty/error/slow.
+> **High-risk** (breaking contract change, money/irreversible mutations, SSR with per-user data, real-time/async flows): add the breaking-change check and expand/contract plan, idempotency keys, leak checks on SSR output, contract verification (Pact/Schemathesis), and the full seam attacks in section 8.
+
 Most fullstack bugs live at the boundary, not inside either side: the UI and API disagree on shape, errors aren't surfaced, caches go stale, optimistic updates never roll back. This skill makes the boundary explicit, typed, tested and attacked. Follow the `dev-core` workflow; this adds what is specific to the seam.
 
 ## 1. Contract first
