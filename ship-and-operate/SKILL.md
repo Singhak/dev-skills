@@ -110,15 +110,9 @@ Define before deploying (template in `references/release-and-rollback.md`):
 - Production access is least-privilege and audited; changes go through the pipeline, not manual edits.
 
 ## 12. Break-it attacks for ops (dev-core Step 6)
-Run against local/staging only:
-- Start the app with a missing or malformed env var → fails fast with a clear message, no secret printed?
-- Kill the DB/cache/broker → readiness fails, liveness doesn't restart-loop, app recovers when it returns?
-- Send SIGTERM during in-flight requests → graceful drain, no lost jobs?
-- Deploy the new version alongside the old against the migrated schema → both work?
-- Roll back to the previous artefact after migration → still works?
-- Inspect the image (`docker history`, `dive`) and CI logs for secrets; run as non-root confirmed?
-- `terraform plan` shows no unintended destroy; IaC scan clean?
-- Flag off → old behaviour intact; flag on → new behaviour; flag service unreachable → safe default?
+Local or staging only. Most checks are in the Verify table (missing env var, dependency down, SIGTERM, image inspection, plan destroys). Also try:
+- New and old app versions running at once against the migrated schema; then roll back to the previous artefact.
+- Flag off → old behaviour; flag on → new; flag service unreachable → safe default.
 
 ## 13. Verify — proof required (in addition to dev-core)
 All of these run locally or in a disposable environment; none of them change shared or production systems.
