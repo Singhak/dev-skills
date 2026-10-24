@@ -94,29 +94,17 @@ Full list: `references/backend-security.md` (OWASP API Security Top 10 mapped to
 - Don't leak stack traces, SQL errors, or internal IDs in error responses.
 
 ## 6. Break-it attacks for backend (dev-core Step 6)
-After the feature passes, attack it as described in `dev-core/references/break-it.md`. Backend priorities:
-- **IDOR / tenant hopping**: swap every ID in path, query and body for another user's or tenant's
-- **Privilege escalation**: send `role`, `isAdmin`, `ownerId`, `price` fields in the body; call admin routes as a normal user
-- **Token abuse**: missing, expired, `alg:none`, tampered signature, token for a deleted user
-- **Injection** in every parameter, including sort/filter fields and headers
-- **Race conditions**: 20 parallel identical requests for create/charge/redeem/withdraw — check for duplicates and negative balances; run with `-race` in Go
-- **Replay & idempotency**: resend the same request and the same webhook/event twice
-- **Resource abuse**: giant bodies, `limit=10^6`, deep JSON, slow regex input, zip bombs on upload
-- **Dependency failure**: stop the DB/broker container mid-test, make upstream stubs slow or return garbage — verify safe errors, no partial writes, retries bounded
-- **Schema fuzzing**: run Schemathesis (or similar) against the OpenAPI spec to hunt for 500s
-Each successful attack becomes a failing test, then a fix.
+Run the generic playbook in `dev-core/references/break-it.md`, plus these backend-specific attacks:
+- **Swap every ID** in path, query and body for another user's or tenant's; send `role`/`ownerId`/`price` fields the client shouldn't set.
+- **Race it**: 20 parallel identical create/charge/redeem requests (and `go test -race` in Go) — look for duplicates or negative balances. Resend the same webhook/event twice.
+- **Kill dependencies mid-test**: stop the DB/broker container; make upstream stubs slow or return garbage — expect safe errors, no partial writes.
+- **Schema-fuzz** the API against its OpenAPI spec (Schemathesis) to find 500s.
 
 ## 7. Observability
-- **Structured logs** (JSON) with level, timestamp, request/correlation ID, user/tenant ID (not PII), and event name. Never log secrets, tokens, passwords, full card numbers.
-- **Metrics**: RED (rate, errors, duration) per endpoint; queue depth/lag; DB pool usage.
-- **Tracing**: OpenTelemetry propagation across services and queues.
-- Health endpoints: liveness (process alive) and readiness (dependencies reachable).
+Minimum on every change: structured, secret-free logs with a correlation ID; metrics for new endpoints/jobs. Details (RED metrics, tracing, health endpoints): `references/observability-performance.md`.
 
 ## 8. Performance & resilience
-- Measure before optimizing; add a benchmark or load test (k6, Gatling, Locust, JMeter) for performance-sensitive changes.
-- Cache with explicit TTL and invalidation strategy; never cache per-user data under shared keys.
-- Bound everything: thread/connection pools, queue sizes, payload sizes, timeouts.
-- Graceful shutdown: stop accepting work, drain in-flight requests/jobs.
+Minimum: timeouts on every outbound call; bounded pools, queues and payloads. Measure before optimizing. Details: `references/observability-performance.md`.
 
 ## 9. Verify — proof required (in addition to dev-core)
 | Check | Example commands | Pass evidence |
@@ -135,6 +123,7 @@ Each successful attack becomes a failing test, then a fix.
 - The design note has open questions about domain rules → ask before building.
 
 ## Reference files
+- `references/observability-performance.md` — logs, metrics, tracing, health endpoints, performance and resilience
 - `references/backend-testing.md` — per-stack test setup patterns and examples
 - `references/backend-security.md` — OWASP API Top 10 checks with test ideas
 - `references/data-design.md` — domain modeling, schema design, caching strategy, events, eventual consistency, sagas, design note template
