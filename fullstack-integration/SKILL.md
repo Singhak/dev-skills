@@ -81,7 +81,7 @@ Examples: `references/state-and-mutations.md`.
 | E2E (Playwright) on real stack | Critical journeys work end to end, incl. one error path and one refresh-after-mutation check |
 | Breaking-change check in CI | Prevents shipping incompatible changes |
 
-## 8. Break-it attacks at the seam (dev-core Step 7)
+## 8. Break-it attacks at the seam (dev-core Step 6)
 - Change the server response shape (missing field, extra field, null, unknown enum) — does the UI degrade gracefully or crash?
 - Slow network, timeout, offline mid-mutation, server 500 after optimistic update — does it roll back and keep user input?
 - Two tabs/users edit the same entity — lost update? 409 handled?
