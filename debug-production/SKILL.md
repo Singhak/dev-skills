@@ -1,6 +1,6 @@
 ---
 name: debug-production
-description: Systematic workflow for diagnosing and fixing bugs and incidents that happen in deployed environments (production or staging) across frontend, API, services, database, queues and infrastructure. Covers triage and severity, mitigation first, tracing a request from browser to database using correlation IDs, logs, metrics and traces, forming and testing hypotheses, reproducing the failure as an automated test, fixing, verifying, adding alerts, and writing a short post-incident review. Use this skill when the user reports something broken, slow, erroring or behaving differently in a deployed environment, shares an error report, stack trace, Sentry/Datadog/Grafana link, alert or customer complaint, or asks "why is X failing in prod". Do NOT use for bugs found while writing new code locally; dev-core already covers those. Always together with dev-core.
+description: Systematic workflow for diagnosing and fixing bugs and incidents that happen in deployed environments (production or staging) across frontend, API, services, database, queues and infrastructure. Covers triage and severity, mitigation first, tracing a request from browser to database using correlation IDs, logs, metrics and traces, forming and testing hypotheses, reproducing the failure as an automated test, fixing, verifying, adding alerts, and writing a short post-incident review. Use this skill when the user reports something broken, slow, erroring or behaving differently in a deployed environment, shares an error report, stack trace, Sentry/Datadog/Grafana link, alert or customer complaint, or asks "why is X failing in prod". Do NOT use for bugs found while writing new code locally; dev-core already covers those. Treats production as read-only and hands back to the user before any production write, restart, rollback or data fix. Always together with dev-core.
 ---
 
 # Debug Production
@@ -60,6 +60,24 @@ Blameless, short, factual — template in `references/triage-playbook.md`: summa
 - Fix and tests added; how it was verified
 - Prevention: alerts, logging, runbook changes
 - Open questions and recommended follow-ups
+
+## 8. Verify — proof required
+| Check | How | Pass evidence |
+|---|---|---|
+| Evidence collected | logs, traces and error-tracker queries for the incident window (read-only) | Exact UTC times, affected release SHAs, and 2–3 example request IDs recorded |
+| Request traced across layers | search one request ID in browser error tracker, gateway, API logs and trace | Same ID found in each layer it passed through, and the failing layer identified |
+| Release comparison | error rate / latency grouped by version, before vs after the suspected change | Clear difference that lines up with the change in time, or the change ruled out |
+| Root cause explains everything | compare hypothesis against timing, scope (who/where) and error messages | Every symptom accounted for; leftover symptoms listed if not |
+| Reproduction test | run the new test on the current (buggy) code | Fails for the same reason seen in production |
+| Fix works | run the test and the full suite on the fixed code | Test passes; suite exit 0 |
+| Production recovered | after the normal-pipeline deploy, watch the same signals for an agreed window | Error rate / latency back to baseline; no new errors for that release |
+
+## 9. Stop and hand back
+- **Any write to production** (data fix, migration, config/flag change, restart, scaling, rollback) → recommend it with the exact steps and wait for explicit approval. Reading logs, metrics and traces is fine.
+- SEV1/SEV2 → recommend mitigation (rollback or flag off) **first** and hand the decision to the user before deep investigation.
+- Signs of a security incident (one user seeing another's data, leaked credentials, unexpected access) → stop, tell the user immediately, and recommend their security incident process.
+- No access to logs, metrics or traces → list exactly what evidence is needed and how to get it; don't guess a root cause.
+- Can't reproduce after reasonable attempts → report the evidence, hypotheses ruled in/out, and propose targeted instrumentation instead of a speculative fix.
 
 ## Anti-patterns
 - Changing several things at once in production "to see if it helps"
