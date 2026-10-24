@@ -1,6 +1,6 @@
 ---
 name: backend-dev
-description: Backend engineering playbook for APIs, microservices, databases, background jobs, queues/events and CLIs in any language (Node, Python, Java/Spring, Go, .NET, Rust, PHP, Ruby). Covers layered/hexagonal architecture, REST/GraphQL/gRPC API design, TDD with unit, integration (real DB via containers), contract and API end-to-end tests, database migrations, OWASP API security, adversarial "break it" self-attacks (IDOR, injection, race conditions), observability and performance. Use this skill whenever the task touches server-side code, endpoints, controllers, services, repositories, SQL/ORM, migrations, auth, workers, or infrastructure config — always together with the dev-core skill for the base workflow.
+description: Backend engineering playbook for APIs, microservices, databases, background jobs, queues/events and CLIs in any language (Node, Python, Java/Spring, Go, .NET, Rust, PHP, Ruby). Covers layered/hexagonal architecture, REST/GraphQL/gRPC API design, TDD with unit, integration (real DB via containers), contract and API end-to-end tests, database migrations, data modeling, caching strategy, event-driven design and eventual consistency, OWASP API security, adversarial "break it" self-attacks (IDOR, injection, race conditions), observability and performance. Use this skill whenever the task touches server-side code, endpoints, controllers, services, repositories, SQL/ORM, migrations, auth, workers, or infrastructure config — always together with the dev-core skill for the base workflow.
 ---
 
 # Backend Dev
@@ -66,6 +66,8 @@ Key practices:
 - Test retry/timeout behaviour of outbound clients with a stub that delays or fails.
 
 ## 4. Data & persistence
+For a new domain area, significant schema change, caching, events or cross-service data flow, **read `references/data-design.md` first and write a short design note** (template inside) before coding.
+
 - Schema changes only through versioned **migrations** (Flyway, Liquibase, Alembic, Prisma/Drizzle migrate, EF Core, golang-migrate, Rails/Django migrations). Never edit an applied migration.
 - **Zero-downtime changes**: expand → migrate data → contract. Add nullable column / new table first, backfill, switch reads/writes, then drop the old in a later release.
 - Transactions at the use-case level; keep them short; no remote calls inside a DB transaction.
@@ -125,3 +127,6 @@ Each successful attack becomes a failing test, then a fix.
 ## Reference files
 - `references/backend-testing.md` — per-stack test setup patterns and examples
 - `references/backend-security.md` — OWASP API Top 10 checks with test ideas
+- `references/data-design.md` — domain modeling, schema design, caching strategy, events, eventual consistency, sagas, design note template
+
+Related skills: `fullstack-integration` when a UI consumes the API; `ship-and-operate` for deploy/CI/infra changes; `debug-production` for incidents.
