@@ -24,6 +24,11 @@ Typical combinations:
 ## Workflow every change follows (dev-core)
 Understand → plan (risk, flag check, design note) → TDD → right test levels → security pass → quality gates → **break it (hacker mode)** → self-review → report/PR description
 
+## Evidence and exit conditions
+- **No evidence, no claim.** Every skill has a *Verify — proof required* table: the check, example commands, and the observed output that counts as passing. Checks that couldn't run are reported as "not verified".
+- **Stop and hand back.** Every skill lists when the agent must stop and return control: done (all checks have evidence), blocked (missing access or environment), decision needed (breaking change, destructive operation, ambiguous requirement, scope change), risk line crossed (unfixed Critical/High finding, any shared/prod write), or loop limit (same failure after 3 distinct attempts).
+- The final report always includes the evidence and the specific decision or question for the user, if any.
+
 ## Installing
 - **Claude Code**: copy folders to `~/.claude/skills/` or `<repo>/.claude/skills/`.
 - **Claude.ai / Desktop**: upload each `.skill` file in Settings → Capabilities → Skills.
