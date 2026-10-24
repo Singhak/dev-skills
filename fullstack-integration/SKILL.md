@@ -96,6 +96,21 @@ Examples: `references/state-and-mutations.md`.
 - [ ] Contract + component + e2e tests cover success, empty, error and slow responses
 - [ ] Break-it seam attacks run; findings fixed with tests
 
+## 10. Verify — proof required (in addition to dev-core)
+| Check | Example commands | Pass evidence |
+|---|---|---|
+| Generated types are current | regenerate (`npx openapi-typescript …`, `graphql-codegen`, `buf generate`) then `git diff --exit-code` on generated files | No diff after regeneration |
+| No unintended breaking change | `oasdiff breaking base.yaml head.yaml`, `graphql-inspector diff`, `buf breaking --against .git#branch=main` | No breaking changes, or each one approved by the user |
+| Server matches contract | Pact provider verification, or `schemathesis run openapi.yaml --base-url …` against a local server | All interactions verified; no 500s or schema violations |
+| Client handles every response class | component tests with MSW handlers for success, empty, 4xx, 5xx, slow | All pass; optimistic rollback test included where used |
+| End-to-end smoke | `npx playwright test --grep @smoke` against the local full stack | Exit 0; includes one error path and one refresh-after-mutation check |
+| Hydration and leaks | SSR page load in e2e with console listener; inspect serialized state | 0 hydration warnings; no secrets or other users' data in HTML/state |
+
+## 11. Stop and hand back (in addition to dev-core)
+- The contract needs a breaking change → present the expand/contract plan and wait for approval.
+- The other side of the API is owned by another team or repo → deliver the proposed contract change and stop; don't implement against an unagreed contract.
+- The contract is ambiguous (unclear field meaning, error format, pagination) → ask before generating clients.
+
 ## Reference files
 - `references/contracts-and-types.md` — tooling per stack, versioning, breaking-change rules
 - `references/state-and-mutations.md` — code patterns for queries, optimistic updates, SSR hydration
