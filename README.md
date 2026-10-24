@@ -1,39 +1,37 @@
-# Dev Skills Pack — dev-core · backend-dev · frontend-dev
+# Fullstack Dev Skills Pack
 
-Three agent skills that make any coding agent work like a disciplined senior engineer: TDD first, the right test pyramid, security checks on every change, and a clear definition of done.
+Six agent skills that make a coding agent work like a disciplined senior fullstack engineer: TDD first, security on every change, attacking its own code ("break it"), clean integration between UI and server, and safe release and operations.
 
-| Skill | Role | Load when |
+| Skill | Phase | Loaded when |
 |---|---|---|
-| `dev-core` | Universal workflow: understand → plan → TDD → security → quality gates → **break it (hacker mode)** → self-review → report | Every coding task |
-| `backend-dev` | Architecture, API design, unit/integration/contract/API e2e tests, migrations, OWASP API Top 10, observability | Server, API, DB, jobs, CLIs |
-| `frontend-dev` | Component architecture, Testing Library + MSW, Playwright e2e, a11y (WCAG 2.2), XSS/CSP/token security, Core Web Vitals | UI, components, browser |
+| `dev-core` | Every code change | Always, on any coding task (also holds the routing table) |
+| `backend-dev` | Build: server | Server code, APIs, DB, migrations, jobs, data/system design |
+| `frontend-dev` | Build: UI | Components, pages, forms, client state, UX/product quality |
+| `fullstack-integration` | Connect | Work touching both sides of an API, contract changes, stale data / type / error-handling bugs |
+| `ship-and-operate` | Release & run | CI/CD, Docker, IaC, env/secrets, health checks, flags, rollout/rollback, SLOs |
+| `debug-production` | Fix in prod | Bugs and incidents in deployed environments |
 
-Full-stack task → load all three.
+## How triggering works
+Agents always see only each skill's name and description; the full instructions load only when the task matches. Each description says both when to use it and when not to, so `ship-and-operate` stays out of normal feature work and `debug-production` stays out of local bugs. `dev-core` also contains a routing table, including mid-task triggers (e.g. a feature that suddenly needs a new env var pulls in `ship-and-operate`).
 
-## Structure
-```
-dev-core/      SKILL.md, references/{tdd,security-checklist,code-review,project-discovery}.md, scripts/security_scan.sh
-backend-dev/   SKILL.md, references/{backend-testing,backend-security}.md
-frontend-dev/  SKILL.md, references/{frontend-testing,frontend-security}.md
-```
+Typical combinations:
+- New API endpoint → dev-core + backend-dev
+- New screen calling an existing API → dev-core + frontend-dev + fullstack-integration
+- Full feature, UI to DB → dev-core + backend-dev + frontend-dev + fullstack-integration
+- Add Redis + new env vars + deploy → add ship-and-operate
+- "Checkout is failing in prod" → dev-core + debug-production (+ the layer skills as the cause becomes clear)
+
+## Workflow every change follows (dev-core)
+Understand → plan (risk, flag check, design note) → TDD → right test levels → security pass → quality gates → **break it (hacker mode)** → self-review → report/PR description
 
 ## Installing
+- **Claude Code**: copy folders to `~/.claude/skills/` or `<repo>/.claude/skills/`.
+- **Claude.ai / Desktop**: upload each `.skill` file in Settings → Capabilities → Skills.
+- **Other agents (Cursor, Codex, Copilot, Windsurf, Gemini CLI, Aider)**: put folders in `docs/agent-skills/` and add to `AGENTS.md` / `.cursor/rules` / `.github/copilot-instructions.md`:
+  > For every coding task, first read `docs/agent-skills/dev-core/SKILL.md` and follow its routing table to decide which other skills under `docs/agent-skills/` to read. Open files under each skill's `references/` only when relevant.
 
-**Claude Code** — copy folders into `~/.claude/skills/` (personal) or `<repo>/.claude/skills/` (shared with the team).
+## Customize first
+Preferred stack and tools, coverage thresholds, folder structure, branch/PR rules, CI platform and cloud, SLO targets, analytics naming convention.
 
-**Claude.ai / Claude Desktop** — upload each `.skill` file (or zip each folder) under Settings → Capabilities → Skills.
-
-**Claude API / Agent SDK** — upload via the Skills API, or place in the agent's skills directory.
-
-**Other agents (Cursor, Codex, Copilot, Windsurf, Aider, Gemini CLI, etc.)** — the files are plain Markdown:
-- Put the folders in `docs/agent-skills/` in your repo, and
-- Add to `AGENTS.md` / `.cursor/rules/*.mdc` / `.github/copilot-instructions.md` / `CLAUDE.md`:
-  > Before any code change, read `docs/agent-skills/dev-core/SKILL.md`. For backend work also read `backend-dev/SKILL.md`; for frontend work, `frontend-dev/SKILL.md`. Open the referenced files under `references/` when relevant.
-
-## Customizing for your team
-Edit these first so the agent follows *your* conventions:
-- Preferred stack and test runners (sections "Tools" in backend/frontend skills)
-- Coverage thresholds and required gates (dev-core Step 6)
-- Folder structure (Architecture sections)
-- Commit message convention (dev-core §3)
-Keep each SKILL.md under ~500 lines; push detail into `references/`.
+## Safety defaults
+The agent attacks only its own code in local/test environments, and never deploys, applies infrastructure, runs migrations or touches production data without explicit approval in the conversation.
