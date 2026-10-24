@@ -88,7 +88,7 @@ Full list: `references/frontend-security.md`. Must-haves:
 - `postMessage`: always check `event.origin`; specify target origin when sending.
 - Don't put PII or tokens in URLs, analytics events, or console logs.
 
-## 5. Break-it attacks for frontend (dev-core Step 7)
+## 5. Break-it attacks for frontend (dev-core Step 6)
 After the feature passes, attack it as described in `dev-core/references/break-it.md`. Frontend priorities:
 - **XSS**: put payloads (`<img src=x onerror=alert(1)>`, `javascript:` URLs) into every field, URL param, hash, and API response the component renders (mock them with MSW)
 - **Bypass the UI**: disable client validation, edit hidden fields, re-enable disabled buttons in devtools, call the API directly — the backend must still refuse (pair with a backend test)
