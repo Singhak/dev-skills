@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0 — 2026-10-24
+### Added
+- Task evals for backend-dev (coupon double-redeem race), frontend-dev (rich-text XSS) and the stop rule (contradictory tests); every skill now has at least one case.
+- `evals/run_trigger_evals.py`: cross-skill routing eval (stdlib only, uses ANTHROPIC_API_KEY); recommended eval run order.
+- Version-stamped package filenames; Python and PowerShell fallbacks in `package.sh` when `zip` is missing.
+- Explicit out-of-scope note (native mobile, data/ML, embedded, games) in dev-core routing.
+### Changed
+- Layer skills' break-it lists reduced to layer-specific attacks; generic attacks live only in `break-it.md`.
+- Specialist sections moved to references (backend observability/performance, frontend product quality/performance, fullstack domain modeling/real-time). Full-stack load ≈ 11.0k tokens (was ≈ 12.0k).
+- Execution-policy instructions for `install.ps1` / `package.ps1`.
+### Fixed
+- `package.ps1` failed outside Windows (`$env:TEMP`) and used `Compress-Archive`, whose Windows PowerShell 5.1 version can write backslash paths; now writes forward-slash zip entries directly. Tested under PowerShell 7.
+
 ## 1.0.0 — 2026-10-24
 ### Added
 - Six skills: dev-core, backend-dev, frontend-dev, fullstack-integration, ship-and-operate, debug-production.

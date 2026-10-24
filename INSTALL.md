@@ -19,9 +19,9 @@ The install scripts do all of this:
 ./install.sh /path/to/your-repo          # macOS / Linux / WSL (add --copy to copy instead of link)
 ```
 ```powershell
-.\install.ps1 -Repo C:\path\to\your-repo  # Windows: creates a junction (no admin needed); add -Copy to copy
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Repo C:\path\to\your-repo  # Windows: junction (no admin); add -Copy to copy
 ```
-Windows notes: in Git Bash, `ln -s` silently makes a copy unless Developer Mode is enabled, so `install.sh` switches to `--copy` automatically there. Junctions and symlinks don't travel through git to other operating systems; each teammate runs the install script for their OS, or the team commits copies in both folders.
+Windows notes: PowerShell blocks unsigned scripts by default, hence `-ExecutionPolicy Bypass` (this run only). In Git Bash, `ln -s` silently makes a copy unless Developer Mode is enabled, so `install.sh` switches to `--copy` automatically there. Junctions and symlinks don't travel through git to other operating systems; each teammate runs the install script for their OS, or the team commits copies in both folders.
 
 `AGENTS.md` line (helps agents that don't auto-load skills, and reinforces routing for those that do):
 > For every coding task, read `.agents/skills/dev-core/SKILL.md` first and follow its routing table to decide which other skills in `.agents/skills/` to read.
@@ -30,7 +30,7 @@ Windows notes: in Git Bash, `ln -s` silently makes a copy unless Developer Mode 
 | Platform | Project (repo) location | Personal (all projects) | Notes |
 |---|---|---|---|
 | **Claude Code** | `.claude/skills/` | `~/.claude/skills/` | Does not read `.agents/skills/`, hence the link. Also reads `CLAUDE.md`. |
-| **Claude.ai / Claude Desktop** | — | Build with `./package.sh` or `.\package.ps1`, then upload each `dist/*.skill` in Settings → Capabilities → Skills | No repo folders; upload per user/org. |
+| **Claude.ai / Claude Desktop** | — | Build with `./package.sh` or `powershell -ExecutionPolicy Bypass -File .\package.ps1`, then upload each `dist/*.skill` in Settings → Capabilities → Skills | No repo folders; upload per user/org. |
 | **OpenAI Codex** (CLI, IDE extension, app) | `.agents/skills/` (scanned from the working directory up to the repo root) | `~/.agents/skills/` | Reads `AGENTS.md`. Disable a skill via `[[skills.config]]` in `~/.codex/config.toml`. |
 | **Cursor** | `.agents/skills/` or `.cursor/skills/` | `~/.agents/skills/` or `~/.cursor/skills/` | Also reads `.claude/skills/`. Invoke manually with `/skill-name`. For Cloud Agents, use repo skills (personal `~/.agents/skills/` isn't copied there). |
 | **Google Antigravity** (app / IDE) | `.agents/skills/` | `~/.gemini/config/skills/` (legacy `~/.gemini/antigravity/skills/`) | Check active skills in the agent panel's Customizations menu; invoke with `/skill-name`. |

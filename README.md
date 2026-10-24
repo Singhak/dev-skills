@@ -44,10 +44,15 @@ Recommended: real files in `<repo>/.agents/skills/`, a link from `.claude/skills
 ./install.sh /path/to/your-repo              # macOS / Linux / WSL
 ```
 ```powershell
-.\install.ps1 -Repo C:\path\to\your-repo     # Windows (creates a junction; no admin needed)
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Repo C:\path\to\your-repo   # Windows
 ```
 
-Claude.ai / Claude Desktop: run `./package.sh` (or `.\package.ps1`) to build `.skill` files into `dist/`, then upload them in Settings → Capabilities → Skills.
+Claude.ai / Claude Desktop: build versioned `.skill` files into `dist/` (e.g. `dev-core-1.1.0.skill`), then upload them in Settings → Capabilities → Skills:
+```bash
+./package.sh                                              # macOS / Linux / Git Bash (uses zip, or Python if zip is missing)
+powershell -ExecutionPolicy Bypass -File .\package.ps1    # Windows PowerShell
+```
+`-ExecutionPolicy Bypass` applies to that one run only; it doesn't change your system settings.
 
 Per-platform locations (Codex, Cursor, Copilot, Antigravity, Claude Code), personal installs and troubleshooting: **[INSTALL.md](INSTALL.md)**.
 
@@ -56,6 +61,9 @@ Per-platform locations (Codex, Cursor, Copilot, Antigravity, Claude Code), perso
 - Trigger evals (does the right skill load?): `evals/triggers/<skill>.json`
 - Task evals (does the agent follow the workflow?): `<skill>/evals/<case>/`, in the `claude plugin eval` format
 These evals are written but **not yet run**. Run them with the skill-creator skill or `claude plugin eval` before relying on the pack.
+
+## Versioning
+The version is the first `## x.y.z` heading in `CHANGELOG.md`; the package scripts stamp it into the `.skill` filenames. When releasing, update the changelog, then tag the commit to match: `git tag v1.1.0 && git push --tags`.
 
 ## Customize first
 Preferred stack and tools, coverage thresholds, folder structure, branch/PR rules, CI platform and cloud, SLO targets, analytics naming convention.

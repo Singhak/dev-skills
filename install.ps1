@@ -1,7 +1,9 @@
 # Installs the skill pack into a repository on Windows (PowerShell 5.1+ or 7+).
 #   Real files:  <repo>\.agents\skills\<skill>\     (Codex, Cursor, Copilot, Antigravity, others)
 #   Junction:    <repo>\.claude\skills -> .agents\skills   (Claude Code; junctions need no admin rights)
-# Usage: .\install.ps1 -Repo C:\path\to\your-repo [-Copy]
+# Usage (Windows blocks unsigned scripts by default; this bypasses it for this one run only):
+#   powershell -ExecutionPolicy Bypass -File .\install.ps1 -Repo C:\path\to\your-repo [-Copy]
+# Junction mode is Windows-only; on macOS/Linux PowerShell use -Copy or run install.sh.
 param([Parameter(Mandatory=$true)][string]$Repo, [switch]$Copy)
 $ErrorActionPreference = "Stop"
 $src = $PSScriptRoot

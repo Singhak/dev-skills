@@ -5,3 +5,4 @@ Thumbs.db
 *.log
 evals/results/
 */evals/results/
+evals/trigger_results.json
