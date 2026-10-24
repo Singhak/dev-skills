@@ -22,7 +22,7 @@ Typical combinations:
 - "Checkout is failing in prod" → dev-core + debug-production (+ the layer skills as the cause becomes clear)
 
 ## Workflow every change follows (dev-core)
-Classify risk (default vs high-risk) → understand (incl. environment check) → plan → TDD → right test levels → security pass → quality gates → **break it (hacker mode)** → self-review → report/PR description
+Classify risk (default vs high-risk) → understand + environment check + smallest relevant baseline → plan → TDD → five-action security pass → quality gates → **break it** → review diff → verify with evidence and report. dev-core is kept short (~90 lines) because it loads on every task; depth lives in its `references/`.
 
 ## Evidence and exit conditions
 - **No evidence, no claim.** Every skill has a *Verify — proof required* table: the check, example commands, and the observed output that counts as passing. Checks that couldn't run are reported as "not verified".
