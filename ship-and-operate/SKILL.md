@@ -5,6 +5,9 @@ description: Release and operations readiness for any stack. Covers CI/CD pipeli
 
 # Ship and Operate
 
+> **Default** (small config, pipeline step or Dockerfile tweak): lint/validate the changed files, build the image, check health endpoints still work, document new env vars.
+> **High-risk** (new service, production release, IaC change, migration in deploy, new secrets/permissions): add the full release readiness questions, plan review with destroy count, rollback plan with criteria, feature flag, SLO/alert check, and the ops break-it attacks in section 12.
+
 Code that passes tests is not yet safe in production. This skill makes changes **buildable, configurable, deployable, observable and reversible**. Follow the `dev-core` workflow; this adds release/ops specifics. Use the project's existing CI system, cloud and IaC tool — never introduce a new platform without the user's explicit agreement.
 
 **Safety rules:** never run deploys, `terraform apply`, `kubectl apply/delete`, database migrations or secret changes against shared or production environments unless the user explicitly asks in this conversation. Default to: write the change, run `plan`/`diff`/dry-run/lint locally, and show the result.
