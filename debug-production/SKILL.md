@@ -1,9 +1,11 @@
 ---
 name: debug-production
-description: Systematic workflow for diagnosing and fixing bugs and incidents that happen in deployed environments (production or staging) across frontend, API, services, database, queues and infrastructure. Covers triage and severity, mitigation first, tracing a request from browser to database using correlation IDs, logs, metrics and traces, forming and testing hypotheses, reproducing the failure as an automated test, fixing, verifying, adding alerts, and writing a short post-incident review. Use this skill when the user reports something broken, slow, erroring or behaving differently in a deployed environment, shares an error report, stack trace, Sentry/Datadog/Grafana link, alert or customer complaint, or asks "why is X failing in prod". Do NOT use for bugs found while writing new code locally; dev-core already covers those. Treats production as read-only and hands back to the user before any production write, restart, rollback or data fix. Always together with dev-core.
+description: Systematic workflow for bugs and incidents in deployed environments (production or staging) across frontend, API, services, database, queues and infrastructure, covering triage, mitigation first, tracing a request end to end with logs, metrics and traces, testing hypotheses, reproducing as a failing test, fixing, verifying recovery, adding alerts, and a short post-incident review. Use when the user reports something broken, slow or erroring in a deployed environment, or shares an error report, stack trace, alert, dashboard link or customer complaint. Do NOT use for bugs found while coding locally. Treats production as read-only and hands back to the user before any production write, restart, rollback or data fix. Always with dev-core.
 ---
 
 # Debug Production
+
+**How this combines**: this skill drives the investigation; once the cause is found, the fix follows dev-core plus the layer skill(s) where the bug lives.
 
 > **Default** (SEV3–SEV4, contained impact): gather evidence, trace one request, confirm the root cause, reproduce as a test, fix through the normal workflow.
 > **High-risk** (SEV1–SEV2, data loss, security signs): recommend mitigation first and hand the decision to the user, escalate security signs immediately, verify recovery in production signals, and write the post-incident review.
