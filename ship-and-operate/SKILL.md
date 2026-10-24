@@ -107,7 +107,7 @@ Define before deploying (template in `references/release-and-rollback.md`):
 - Same artefact, different config.
 - Production access is least-privilege and audited; changes go through the pipeline, not manual edits.
 
-## 12. Break-it attacks for ops (dev-core Step 7)
+## 12. Break-it attacks for ops (dev-core Step 6)
 Run against local/staging only:
 - Start the app with a missing or malformed env var → fails fast with a clear message, no secret printed?
 - Kill the DB/cache/broker → readiness fails, liveness doesn't restart-loop, app recovers when it returns?
