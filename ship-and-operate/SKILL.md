@@ -1,9 +1,11 @@
 ---
 name: ship-and-operate
-description: Release and operations readiness for any stack. Covers CI/CD pipelines and quality gates, Dockerfiles and container hardening, environment and secret configuration, infrastructure-as-code (Terraform, Pulumi, CloudFormation, Kubernetes/Helm), health checks, staging vs production, feature flags, rollout strategies (rolling, blue-green, canary), rollback criteria, database migrations during deploys, SLOs and error budgets. Use this skill ONLY when the task involves deploying, releasing, building or editing a CI/CD pipeline, changing a Dockerfile/compose/K8s/IaC file, adding environment variables or secrets, setting up health checks, monitoring/alerting/SLOs, feature flags, or preparing a production release. Do NOT use for ordinary feature coding, refactoring or local bug fixes that don't change how the app is built, configured or deployed. Verifies with dry-runs/plans only; hands back to the user before any deploy, apply or migration on shared or production environments. Always together with dev-core.
+description: Release and operations readiness for any stack, covering CI/CD pipelines and gates, Dockerfiles, environment and secret config, infrastructure-as-code, health checks, staging vs production, feature flags, rollout and rollback, migrations during deploys, SLOs and alerts. Use ONLY when the task changes how the app is built, configured or deployed — CI/CD files, Dockerfile/compose/K8s/IaC, env vars or secrets, health checks, monitoring/alerting, feature flags, or preparing a release. Do NOT use for ordinary feature coding or local bug fixes. Verifies with dry-runs and plans only, and hands back to the user before any deploy, apply or migration on shared or production environments. Always with dev-core.
 ---
 
 # Ship and Operate
+
+**How this combines**: dev-core owns the workflow and report; this skill adds release/ops steps, Verify rows and stop rules. Pull it in mid-task whenever a feature needs new config, a deploy-time migration or a flag.
 
 > **Default** (small config, pipeline step or Dockerfile tweak): lint/validate the changed files, build the image, check health endpoints still work, document new env vars.
 > **High-risk** (new service, production release, IaC change, migration in deploy, new secrets/permissions): add the full release readiness questions, plan review with destroy count, rollback plan with criteria, feature flag, SLO/alert check, and the ops break-it attacks in section 12.
@@ -118,19 +120,7 @@ Run against local/staging only:
 - `terraform plan` shows no unintended destroy; IaC scan clean?
 - Flag off → old behaviour intact; flag on → new behaviour; flag service unreachable → safe default?
 
-## 13. Definition of Done (ops-touching changes)
-- [ ] Pipeline runs all gates; artefact built once and promoted
-- [ ] Dockerfile hardened (non-root, pinned, multi-stage, scanned, no secrets)
-- [ ] New config documented, validated at startup; secrets in a secret manager
-- [ ] Liveness/readiness probes correct; version exposed
-- [ ] IaC formatted, validated, scanned; plan reviewed; no unintended destroys
-- [ ] Migration compatible with old and new versions; rollback works
-- [ ] Risky change behind a flag (default off) with owner and removal date
-- [ ] Rollback mechanism and criteria written down
-- [ ] Metrics/logs/traces, SLO impact and alerts considered; runbook updated
-- [ ] Nothing deployed or applied to shared/prod environments without explicit user approval
-
-## 14. Verify — proof required (in addition to dev-core)
+## 13. Verify — proof required (in addition to dev-core)
 All of these run locally or in a disposable environment; none of them change shared or production systems.
 
 | Check | Example commands | Pass evidence |
@@ -143,9 +133,11 @@ All of these run locally or in a disposable environment; none of them change sha
 | Graceful shutdown | `docker stop` during a request | In-flight request completes; clean exit within grace period |
 | IaC | `terraform fmt -check && terraform validate && terraform plan -out=tfplan`; `terraform show -json tfplan` to count deletes; `checkov -d .` or `trivy config .` | Exit 0; destroys/replaces = 0 or each one listed and flagged |
 | Kubernetes manifests | `helm template … \| kubeconform -strict` or `kubectl apply --dry-run=client` | Exit 0 |
+| Config documented | diff of `.env.example` / README | Every new variable documented (name, purpose, required, default); secrets reference a secret manager |
+| Flags & observability | review | Risky change behind a default-off flag with owner and removal date; metrics/alerts and runbook updated for new paths |
 | Rollback ready | rollback plan written (template in references); previous artefact tag identified | Plan includes mechanism, criteria, owner, data considerations |
 
-## 15. Stop and hand back (in addition to dev-core)
+## 14. Stop and hand back (in addition to dev-core)
 - **Any** deploy, `apply`, migration, secret change, restart or scaling action on a shared, staging or production environment → present the exact command and plan, then wait for explicit approval in this conversation.
 - A plan shows destroy or replace of a stateful resource (database, bucket, volume, queue) → stop and flag it loudly.
 - The change needs new paid cloud resources, new credentials or IAM permissions, or a new platform/vendor → ask first.
