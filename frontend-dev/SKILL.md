@@ -1,6 +1,6 @@
 ---
 name: frontend-dev
-description: Frontend engineering playbook for web and mobile UIs in any framework (React, Next.js, Vue, Nuxt, Angular, Svelte, SolidJS, React Native, plain JS/TS). Covers component architecture, state and data fetching, TDD with unit and component tests (Testing Library), API mocking (MSW), end-to-end tests (Playwright/Cypress), visual regression, accessibility (WCAG 2.2), frontend security (XSS, CSP, token storage), adversarial "break it" self-attacks (UI bypass, double-submit, hostile data) and performance (Core Web Vitals). Use this skill whenever the task touches UI components, pages, forms, styling, client state, routing, browser behaviour or frontend tests — always together with the dev-core skill for the base workflow.
+description: Frontend engineering playbook for web and mobile UIs in any framework (React, Next.js, Vue, Nuxt, Angular, Svelte, SolidJS, React Native, plain JS/TS). Covers component architecture, state and data fetching, TDD with unit and component tests (Testing Library), API mocking (MSW), end-to-end tests (Playwright/Cypress), visual regression, accessibility (WCAG 2.2), frontend security (XSS, CSP, token storage), adversarial "break it" self-attacks (UI bypass, double-submit, hostile data) performance (Core Web Vitals), and product quality (design-system consistency, complete user journeys, microcopy, analytics instrumentation). Use this skill whenever the task touches UI components, pages, forms, styling, client state, routing, browser behaviour or frontend tests — always together with the dev-core skill for the base workflow.
 ---
 
 # Frontend Dev
@@ -96,7 +96,18 @@ After the feature passes, attack it as described in `dev-core/references/break-i
 - **Accessibility break**: keyboard-only, 200% zoom, screen reader labels, reduced motion
 Each successful attack becomes a failing component/e2e test, then a fix.
 
-## 6. Performance
+## 6. Product quality and UX
+Technical correctness isn't enough; the feature must be usable and consistent. What the agent should do:
+- **Design system first**: use existing components and tokens (spacing, colour, typography, radius). Don't create a one-off component when a system component fits; if a gap exists, flag it rather than inventing a new pattern silently.
+- **Complete user journeys**: walk the whole flow, not just the screen — entry points, first-time (empty) experience, success confirmation, error recovery, back/refresh behaviour, deep links, and what happens next.
+- **Microcopy**: clear, specific, action-oriented labels and messages. Error text says what happened and how to fix it ("Card expired — use a different card"), not "Something went wrong". Follow the product's tone; keep strings in the i18n system.
+- **Feedback and affordance**: every action gets visible feedback (pending state, success toast, inline confirmation); destructive actions require confirmation or offer undo.
+- **Forms**: minimal fields, correct input types and `autocomplete`, inline validation on blur, preserve input on error, sensible defaults.
+- **Analytics instrumentation**: when the project tracks events, add them per the existing tracking plan/naming convention (e.g. `object_action`: `checkout_started`, `checkout_completed`), with properties that answer real product questions, and **never** PII, tokens or free-text input. Test that key events fire once (not on every render).
+- **Conversion-critical paths** (signup, onboarding, checkout): minimize steps and distractions, keep primary action obvious, avoid layout shift around buttons.
+- **Flag UX risks for a human** instead of guessing: confusing flows, unclear copy, missing designs for states, accessibility trade-offs. The agent can't measure usability or conversion without real users — it should say so and suggest how to validate (usability test, A/B test behind a flag, analytics funnel).
+
+## 7. Performance
 - Targets (Core Web Vitals, p75): **LCP < 2.5 s, INP < 200 ms, CLS < 0.1**.
 - Code-split by route; lazy-load heavy, below-the-fold components.
 - Optimize images (modern formats, responsive `srcset`, explicit width/height, lazy loading); preload the LCP image and key fonts.
@@ -104,7 +115,7 @@ Each successful attack becomes a failing component/e2e test, then a fix.
 - Watch bundle size (bundle analyzer, size-limit in CI); question every new dependency.
 - Measure with Lighthouse / Lighthouse CI and real-user monitoring, not intuition.
 
-## 7. Frontend Definition of Done (in addition to dev-core)
+## 8. Frontend Definition of Done (in addition to dev-core)
 - [ ] Component tests cover interaction plus loading / empty / error states
 - [ ] Pure logic and hooks unit-tested
 - [ ] E2E test added/updated if a critical journey changed
@@ -113,8 +124,12 @@ Each successful attack becomes a failing component/e2e test, then a fix.
 - [ ] No raw HTML injection without sanitization; no secrets or tokens in bundle, URLs or logs
 - [ ] Break-it round done: XSS, UI-bypass, double-submit, hostile data and state-tampering attacks tried; findings fixed with tests
 - [ ] No new console errors/warnings; bundle size impact checked
+- [ ] Uses design-system components/tokens; full journey (empty, success, error, back/refresh) handled; copy is clear
+- [ ] Analytics events follow the tracking plan, fire once, contain no PII
 - [ ] Strings ready for i18n if the project localizes (no hard-coded user-facing text outside the i18n system)
 
 ## Reference files
 - `references/frontend-testing.md` — Testing Library, MSW, Playwright patterns and examples
 - `references/frontend-security.md` — detailed browser security checks with test ideas
+
+Related skills: `fullstack-integration` when consuming or changing an API (state, mutations, SSR, errors); `ship-and-operate` for build/deploy; `debug-production` for production UI issues.
