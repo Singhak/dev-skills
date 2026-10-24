@@ -16,6 +16,8 @@ Used on every coding task. Keep this flow short for small changes; open the refe
 | `ship-and-operate` | changes CI/CD, Docker, IaC, env vars/secrets, health checks, monitoring, flags, or prepares a release | ordinary feature work |
 | `debug-production` | investigates a problem in a **deployed** environment | bug found while coding locally |
 
+Out of scope for stack-specific guidance: native mobile UI (Swift/Kotlin), data/ML pipelines, embedded and game engines. For those, apply this skill's workflow, follow the project's own conventions, and tell the user the layer skills don't cover that stack.
+
 Pull skills in mid-task when the work turns out to need them (e.g. a feature needs a new env var → `ship-and-operate`).
 
 **Combining skills:** this skill owns the workflow, the common checks and the report. Other skills add only their layer-specific steps, Verify rows and stop rules — don't repeat dev-core checks for each skill. Produce **one** combined evidence table and one report, however many skills are loaded.
