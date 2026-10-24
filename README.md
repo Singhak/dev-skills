@@ -1,6 +1,26 @@
 # Fullstack Dev Skills Pack
 
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://singhak.github.io/dev-skills/)
+[![Version](https://img.shields.io/badge/version-1.1.1-green)](CHANGELOG.md)
+[![Agent Skills](https://img.shields.io/badge/format-Agent%20Skills-purple)](INSTALL.md)
+
 Six agent skills that make a coding agent work like a disciplined senior fullstack engineer: TDD first, security on every change, attacking its own code ("break it"), clean integration between UI and server, and safe release and operations.
+
+The same files work in Claude Code, Claude.ai, OpenAI Codex, Cursor, GitHub Copilot, Google Antigravity and any other agent that supports the open Agent Skills format.
+
+**📖 Documentation: [singhak.github.io/dev-skills](https://singhak.github.io/dev-skills/)**
+
+## Quick start
+```bash
+git clone https://github.com/Singhak/dev-skills.git && cd dev-skills
+./install.sh /path/to/your-repo                                                      # macOS / Linux / WSL
+```
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Repo C:\path\to\your-repo   # Windows
+```
+Then ask your agent "which skills do you have available?". Details, including Claude.ai upload: [Installing](#installing).
+
+## Skills
 
 | Skill | Phase | Loaded when |
 |---|---|---|
@@ -22,7 +42,7 @@ Typical combinations:
 - "Checkout is failing in prod" → dev-core + debug-production (+ the layer skills as the cause becomes clear)
 
 ## Workflow every change follows (dev-core)
-Classify risk (default vs high-risk) → understand + environment check + smallest relevant baseline → plan → TDD → five-action security pass → quality gates → **break it** → review diff → verify with evidence and report. dev-core is kept short (~90 lines) because it loads on every task; depth lives in its `references/`.
+Classify risk (default vs high-risk) → understand + environment check + smallest relevant baseline → plan → TDD → five-action security pass → quality gates → **break it** → review diff → verify with evidence and report. dev-core is kept short (~100 lines) because it loads on every task; depth lives in its `references/`.
 
 ## Evidence and exit conditions
 - **No evidence, no claim.** Every skill has a *Verify — proof required* table: the check, example commands, and the observed output that counts as passing. Checks that couldn't run are reported as "not verified".
@@ -57,10 +77,30 @@ powershell -ExecutionPolicy Bypass -File .\package.ps1    # Windows PowerShell
 Per-platform locations (Codex, Cursor, Copilot, Antigravity, Claude Code), personal installs and troubleshooting: **[INSTALL.md](INSTALL.md)**.
 
 ## Testing the pack
-- Scanner regression tests: `bash dev-core/tests/run_scan_tests.sh`
-- Trigger evals (does the right skill load?): `evals/triggers/<skill>.json`
-- Task evals (does the agent follow the workflow?): `<skill>/evals/<case>/`, in the `claude plugin eval` format
-These evals are written but **not yet run**. Run them with the skill-creator skill or `claude plugin eval` before relying on the pack.
+Run cheapest first:
+1. Scanner regression tests: `bash dev-core/tests/run_scan_tests.sh` (no model, seconds)
+2. Trigger evals (does the right skill load?): `python evals/run_trigger_evals.py --model <id>` over `evals/triggers/<skill>.json` (96 cases × 3 repeats = 288 short API calls; needs `ANTHROPIC_API_KEY`)
+3. Description tuning per skill with the skill-creator `run_loop`
+4. Task evals (does the agent follow the workflow?): `<skill>/evals/<case>/`, in the `claude plugin eval` format; every skill has at least one case. The backend fixture needs Node ≥ 22.13.
+
+These evals are written but **not yet run**. Run them before relying on the pack. Details: [evals/README.md](evals/README.md).
+
+## Repository layout
+```
+<skill>/                  # dev-core, backend-dev, frontend-dev, fullstack-integration, ship-and-operate, debug-production
+  SKILL.md                # what the agent loads
+  references/             # depth, opened only when a step needs it
+  evals/<case>/           # task evals (claude plugin eval format)
+dev-core/scripts/         # diff_risk_scan.sh, security_scan.sh
+dev-core/tests/           # scanner regression tests
+evals/                    # trigger evals and runner
+docs/                     # GitHub Pages site
+install.sh / install.ps1  # install into a repo
+package.sh / package.ps1  # build .skill files for Claude.ai
+```
+
+## Documentation site
+The `docs/` folder is a Jekyll site (just-the-docs theme) published with GitHub Pages: **Settings → Pages → Deploy from a branch → `master` / `/docs`**. Preview locally with `cd docs && bundle install && bundle exec jekyll serve`, then open `http://localhost:4000/dev-skills/`.
 
 ## Versioning
 The version is the first `## x.y.z` heading in `CHANGELOG.md`; the package scripts stamp it into the `.skill` filenames. When releasing, update the changelog, then tag the commit to match: `git tag v1.1.0 && git push --tags`.

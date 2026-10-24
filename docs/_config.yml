@@ -1,0 +1,34 @@
+title: Fullstack Dev Skills Pack
+description: Six agent skills that make a coding agent work like a disciplined senior fullstack engineer.
+url: https://singhak.github.io
+baseurl: /dev-skills
+
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  "View on GitHub": https://github.com/Singhak/dev-skills
+aux_links_new_tab: true
+
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: https://github.com/Singhak/dev-skills
+gh_edit_branch: master
+gh_edit_source: docs
+gh_edit_view_mode: tree
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+footer_content: 'See the <a href="https://github.com/Singhak/dev-skills/blob/master/CHANGELOG.md">changelog</a> and <a href="https://github.com/Singhak/dev-skills/blob/master/LICENSE">license</a>.'
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

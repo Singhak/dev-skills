@@ -7,3 +7,9 @@ evals/results/
 */evals/results/
 evals/trigger_results.json
 __pycache__/
+
+# GitHub Pages local preview
+docs/_site/
+docs/.jekyll-cache/
+docs/Gemfile.lock
+docs/vendor/
