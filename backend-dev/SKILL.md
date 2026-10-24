@@ -5,6 +5,9 @@ description: Backend engineering playbook for APIs, microservices, databases, ba
 
 # Backend Dev
 
+> **Default**: layered structure, unit tests for logic, API tests for happy path + validation + 401/403, quick security pass, one break-it round.
+> **High-risk** (auth, money, PII, schema/migration, public contract, concurrency): add the design note (`references/data-design.md`), integration tests on a real DB, the full authorization matrix and OWASP API checks (`references/backend-security.md`), race/replay attacks, and an expand/contract migration plan.
+
 Apply the `dev-core` workflow (understand → plan → TDD → security → gates → break it → report). This skill adds what is specific to server-side work. Always follow the project's existing framework and structure first; the patterns below are defaults when nothing exists.
 
 ## 1. Architecture
