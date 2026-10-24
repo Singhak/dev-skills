@@ -1,6 +1,6 @@
 ---
 name: ship-and-operate
-description: Release and operations readiness for any stack. Covers CI/CD pipelines and quality gates, Dockerfiles and container hardening, environment and secret configuration, infrastructure-as-code (Terraform, OpenTofu, Pulumi, CloudFormation, Bicep, Kubernetes/Helm), health checks, staging vs production, feature flags, rollout strategies (rolling, blue-green, canary), rollback criteria, database migrations during deploys, SLOs and error budgets. Use this skill ONLY when the task involves deploying, releasing, building or editing a CI/CD pipeline, writing or changing a Dockerfile/compose/Kubernetes/IaC file, adding environment variables or secrets, setting up health checks, monitoring/alerting/SLOs, feature flags, or preparing a production release. Do NOT use for ordinary feature coding, refactoring or local bug fixes that don't change how the app is built, configured or deployed. Always together with dev-core.
+description: Release and operations readiness for any stack. Covers CI/CD pipelines and quality gates, Dockerfiles and container hardening, environment and secret configuration, infrastructure-as-code (Terraform, Pulumi, CloudFormation, Kubernetes/Helm), health checks, staging vs production, feature flags, rollout strategies (rolling, blue-green, canary), rollback criteria, database migrations during deploys, SLOs and error budgets. Use this skill ONLY when the task involves deploying, releasing, building or editing a CI/CD pipeline, changing a Dockerfile/compose/K8s/IaC file, adding environment variables or secrets, setting up health checks, monitoring/alerting/SLOs, feature flags, or preparing a production release. Do NOT use for ordinary feature coding, refactoring or local bug fixes that don't change how the app is built, configured or deployed. Verifies with dry-runs/plans only; hands back to the user before any deploy, apply or migration on shared or production environments. Always together with dev-core.
 ---
 
 # Ship and Operate
@@ -126,6 +126,27 @@ Run against local/staging only:
 - [ ] Rollback mechanism and criteria written down
 - [ ] Metrics/logs/traces, SLO impact and alerts considered; runbook updated
 - [ ] Nothing deployed or applied to shared/prod environments without explicit user approval
+
+## 14. Verify — proof required (in addition to dev-core)
+All of these run locally or in a disposable environment; none of them change shared or production systems.
+
+| Check | Example commands | Pass evidence |
+|---|---|---|
+| Pipeline syntax | `actionlint`, `gitlab-ci-lint`/CI lint API, `circleci config validate` | Exit 0 |
+| Image builds and is hardened | `docker build -t app:test .`; `docker run --rm --entrypoint id app:test -u` (where a shell exists) or check `USER` in `docker inspect` | Build exit 0; user is not 0/root |
+| Image scan | `trivy image --severity HIGH,CRITICAL --exit-code 1 app:test` | Exit 0, or each finding reported |
+| Config fails fast | start the container with a required env var missing | Non-zero exit; message names the variable; no secret value printed |
+| Health checks | start the stack (`docker compose up -d`); `curl -fsS localhost:PORT/health/live` and `/health/ready`; stop the DB and re-check ready | live 200; ready 200, then non-200 with DB down, then 200 when it's back |
+| Graceful shutdown | `docker stop` during a request | In-flight request completes; clean exit within grace period |
+| IaC | `terraform fmt -check && terraform validate && terraform plan -out=tfplan`; `terraform show -json tfplan` to count deletes; `checkov -d .` or `trivy config .` | Exit 0; destroys/replaces = 0 or each one listed and flagged |
+| Kubernetes manifests | `helm template … \| kubeconform -strict` or `kubectl apply --dry-run=client` | Exit 0 |
+| Rollback ready | rollback plan written (template in references); previous artefact tag identified | Plan includes mechanism, criteria, owner, data considerations |
+
+## 15. Stop and hand back (in addition to dev-core)
+- **Any** deploy, `apply`, migration, secret change, restart or scaling action on a shared, staging or production environment → present the exact command and plan, then wait for explicit approval in this conversation.
+- A plan shows destroy or replace of a stateful resource (database, bucket, volume, queue) → stop and flag it loudly.
+- The change needs new paid cloud resources, new credentials or IAM permissions, or a new platform/vendor → ask first.
+- CI secrets or cloud access needed for verification are unavailable → report which checks are unverified.
 
 ## Reference files
 - `references/ci-cd-and-containers.md` — pipeline and Dockerfile templates
